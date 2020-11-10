@@ -3,7 +3,7 @@
 
 Welcome! This repository contains the data and code needed to reproduce the main figures from our recently submitted paper to Elife. The paper is titled "Impaired adaptation of learning to contingency volatility in internalizing psychopathology" and is authored by Christopher Gagne, Ondrej Zika, Peter Dayan & Sonia J. Bishop.
 
-This Github repository is also linked to an OpenScience framework repository: LINK TO BE ADDED.
+This Github repository is also linked to an OpenScience framework repository, where it will be hosted permanently. 
 
 ## Installations
 
@@ -56,4 +56,4 @@ python fit_model_to_dataset.py --seed 3 --modelname "single+goodbad(all)+smag+ck
 This code needs to be run in the Python conda environment. It also relies on additional code found in the `/model_code` folder.
 
 The code used to generate the figures related to the behavior model (Figures 3-5, and their figure supplements) can also be found in the folder `/figure_code` in the Jupyter notebooks `Figures_3-4_Behavioral_Model_Exp1_Results.ipynb` and `Figure_5_Behavioral_Model_Exp2_Results.ipynb`.
-This code requires the model fits contained in the `/fittings_behavioral_model_exp1[2]/model_fits/` folders. Due to space constraints on github, these files will be separately uploaded to the OpenScience framework repository linked to this github repository, in the folders `model_fits_exp1` and `model_fits_exp2`. 
+This code requires the model fits contained in the `/fittings_behavioral_model_exp1[2]/model_fits/` folders. Due to space constraints on github, these files will be separately uploaded to the OpenScience framework repository linked to this github repository, in the folders `model_fits_exp1` and `model_fits_exp2`.
