@@ -3,7 +3,7 @@
 
 Welcome! This repository contains the data and code needed to reproduce the main figures from our recently submitted paper to Elife. The paper is titled "Impaired adaptation of learning to contingency volatility in internalizing psychopathology" and is authored by Christopher Gagne, Ondrej Zika, Peter Dayan & Sonia J. Bishop.
 
-This Github repository is also linked to an OpenScience framework repository, where it will be hosted permanently. 
+This Github repository is also linked to an OpenScience framework repository, where it will be hosted permanently: LINK TO BE ADDED WHEN MADE PUBLIC
 
 ## Installations
 
