@@ -295,7 +295,7 @@ def get_data(dftmp,gen_data_path=None):
     data['MID_all_unique']=MID_has_both+MID_rew_only+MID_pain_only
 
     # Get data for each subset of subjects
-    folders = [BASEDIR+'data/data_raw_exp1/',BASEDIR+'data/data_raw_exp1_additional_sample/']
+    folders = [BASEDIR+'data/data_raw_exp1/']
     out_pain_has_both = load_dataset('pain',
         folders,
         mask=False,
@@ -304,7 +304,7 @@ def get_data(dftmp,gen_data_path=None):
         MIDSin=MID_has_both)
 
 
-    folders = [BASEDIR+'data/data_raw_exp1/',BASEDIR+'data/data_raw_exp1_additional_sample/']
+    folders = [BASEDIR+'data/data_raw_exp1/']
     out_pain_pain_only = load_dataset('pain',
         folders,
         mask=False,
@@ -313,7 +313,7 @@ def get_data(dftmp,gen_data_path=None):
         MIDSin=MID_pain_only)
 
 
-    folders = [BASEDIR+'data/data_raw_exp1/',BASEDIR+'data/data_raw_exp1_additional_sample/']
+    folders = [BASEDIR+'data/data_raw_exp1/']
     out_rew_has_both = load_dataset('rew',
         folders,
         mask=False,
@@ -322,7 +322,7 @@ def get_data(dftmp,gen_data_path=None):
         MIDSin=MID_has_both)
 
 
-    folders = [BASEDIR+'data/data_raw_exp1/',BASEDIR+'data/data_raw_exp1_additional_sample/']
+    folders = [BASEDIR+'data/data_raw_exp1/']
     out_rew_rew_only = load_dataset('rew',
         folders,
         mask=False,
@@ -491,7 +491,6 @@ def get_data(dftmp,gen_data_path=None):
     data['istab']=istab
     data['ivol']=ivol
 
-
     # start indicator
     data['start1']=np.zeros_like(good_outcome)
     data['start2']=np.zeros_like(good_outcome)
@@ -548,7 +547,7 @@ def get_data(dftmp,gen_data_path=None):
     EPQN=np.array(EPQN)
 
     # Groups
-    dftmp.loc[dftmp['group_p_c'].isnull(),'group_p_c']='control' # a few of mike's subjects didn't have group
+    dftmp.loc[dftmp['group_p_c'].isnull(),'group_p_c']='nonpatient'
     group_p_c = []
     for MID in MID_combined:
         group_p_c.append(dftmp.loc[dftmp.MID==MID,'group_p_c'].values[0])
@@ -563,17 +562,9 @@ def get_data(dftmp,gen_data_path=None):
         group_diag.append(diag)
     group_diag=np.array(group_diag)
 
-    group_diag3 = group_diag.copy()
-    group_diag3[group_diag3=='control_mfmri']='control'
-    group_diag3[group_diag3=='control_cdm']='control'
 
     try:
         scores_df_bi3_noASI_w_janines = pd.read_csv(BASEDIR+'fitting_bifactor_model/bifactor_exp1_poly_scores_exp1.csv')
-        #scores_df_bi3_noASI_subset = pd.read_csv(BASEDIR+'bifactor_analysis/omega2_poly_scores_cdm_only.cdm_noASI_subset.csv')
-        #scores_df_oblimin2 = pd.read_csv(BASEDIR+'bifactor_analysis/oblimin2_cdm_scores_bartlett.csv')
-        #scores_df_oblimin2 = pd.read_csv(BASEDIR+'bifactor_analysis/oblimin2_scores_tenBerge.csv')
-        #scores_df_pca5 = pd.read_csv(BASEDIR+'bifactor_analysis/pca5_scores.csv')
-        #scores_df_oblimin3 = pd.read_csv(BASEDIR+'bifactor_analysis/oblimin3_cdm_poly_scores_bartlett.csv')
 
     except:
         # place holder until factor analysis is run
@@ -581,30 +572,8 @@ def get_data(dftmp,gen_data_path=None):
                                                         'g':np.ones(len(STAI)),
                                                         'F1.':np.ones(len(STAI)),
                                                         'F2.':np.ones(len(STAI))})
-        # scores_df_bi3_noASI_subset = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                                 'g':np.ones(len(STAI)),
-        #                                                 'F1.':np.ones(len(STAI)),
-        #                                                 'F2.':np.ones(len(STAI))})
-        # scores_df_oblimin2 = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                                 'F1':np.ones(len(STAI)),
-        #                                                 'F2':np.ones(len(STAI))})
-        # scores_df_oblimin3 = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                                 'F1':np.ones(len(STAI)),
-        #                                                 'F2':np.ones(len(STAI)),
-        #                                                 'F3':np.ones(len(STAI))})
-        # scores_df_pca5 = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                                 'PA1':np.ones(len(STAI)),
-        #                                                 'PA2':np.ones(len(STAI)),
-        #                                                 'PA3':np.ones(len(STAI)),
-        #                                                 'PA4':np.ones(len(STAI)),
-        #                                                 'PA5':np.ones(len(STAI))})
 
     scores_df_bi3_noASI_w_janines=scores_df_bi3_noASI_w_janines.rename(columns={'Unnamed: 0':'MID'})
-    # scores_df_bi3_noASI_subset=scores_df_bi3_noASI_subset.rename(columns={'Unnamed: 0':'MID'})
-    # scores_df_oblimin2=scores_df_oblimin2.rename(columns={'Unnamed: 0':'MID','PA1':'F1','PA2':'F2'})
-    # scores_df_oblimin3=scores_df_oblimin3.rename(columns={'Unnamed: 0':'MID','PA1':'F1','PA2':'F2','PA3':'F3'})
-    # scores_df_pca5=scores_df_pca5.rename(columns={'Unnamed: 0':'MID'})
-    #
 
     Bi1item_w_j = []
     Bi2item_w_j = []
@@ -628,36 +597,10 @@ def get_data(dftmp,gen_data_path=None):
         Bi1item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'g'].values[0])
         Bi2item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'F1.'].values[0])
         Bi3item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'F2.'].values[0]) ##
-        # Bi1item_subset.append(scores_df_bi3_noASI_subset.loc[scores_df_bi3_noASI_subset.MID==MID,'g'].values[0])
-        # Bi2item_subset.append(scores_df_bi3_noASI_subset.loc[scores_df_bi3_noASI_subset.MID==MID,'F1.'].values[0])
-        # Bi3item_subset.append(scores_df_bi3_noASI_subset.loc[scores_df_bi3_noASI_subset.MID==MID,'F2.'].values[0]) ##
-        # Oblimin2_1.append(scores_df_oblimin2.loc[scores_df_oblimin2.MID==MID,'F1'].values[0])
-        # Oblimin2_2.append(scores_df_oblimin2.loc[scores_df_oblimin2.MID==MID,'F2'].values[0])
-        # PCA_1.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC1'].values[0])
-        # PCA_2.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC2'].values[0])
-        # PCA_3.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC3'].values[0])
-        # PCA_4.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC4'].values[0])
-        # PCA_5.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC5'].values[0])
-        # Oblimin3_1.append(scores_df_oblimin3.loc[scores_df_oblimin3.MID==MID,'F1'].values[0])
-        # Oblimin3_2.append(scores_df_oblimin3.loc[scores_df_oblimin3.MID==MID,'F2'].values[0])
-        # Oblimin3_3.append(scores_df_oblimin3.loc[scores_df_oblimin3.MID==MID,'F3'].values[0])
 
     Bi1item_w_j = np.array(Bi1item_w_j)
     Bi2item_w_j = np.array(Bi2item_w_j)
     Bi3item_w_j = np.array(Bi3item_w_j)
-    # Bi1item_subset = np.array(Bi1item_subset)
-    # Bi2item_subset = np.array(Bi2item_subset)
-    # Bi3item_subset = np.array(Bi3item_subset)
-    # Oblimin2_1  = np.array(Oblimin2_1)
-    # Oblimin2_2  = np.array(Oblimin2_2)
-    # PCA_1  = np.array(PCA_1)
-    # PCA_2  = np.array(PCA_2)
-    # PCA_3  = np.array(PCA_3)
-    # PCA_4  = np.array(PCA_4)
-    # PCA_5  = np.array(PCA_5)
-    # Oblimin3_1  = np.array(Oblimin3_1)
-    # Oblimin3_2  = np.array(Oblimin3_2)
-    # Oblimin3_3  = np.array(Oblimin3_3)
 
     # Normalize covariates (across everyone)
     STAI_scaled = scale(STAI)
@@ -689,43 +632,14 @@ def get_data(dftmp,gen_data_path=None):
     CESD_nonscaled = np.array(CESD)
     EPQN_nonscaled = np.array(EPQN)
 
-
     group_p_c_indic = group_p_c.copy()
     group_p_c_indic[group_p_c_indic=='patient']=1.0
-    group_p_c_indic[group_p_c_indic=='control']=0.0
+    group_p_c_indic[group_p_c_indic=='nonpatient']=0.0
     group_p_c_indic = group_p_c_indic.astype('float')
-
-    group_diag3_indicMDD = np.zeros(len(group_p_c))
-    group_diag3_indicMDD[group_diag3=='MDD']=1.0
-    group_diag3_indicMDD = group_diag3_indicMDD.astype('float')
-    group_diag3_indicGAD = np.zeros(len(group_p_c))
-    group_diag3_indicGAD[group_diag3=='GAD']=1.0
-    group_diag3_indicGAD = group_diag3_indicGAD.astype('float')
-
-    # group diag 4 (added 5/13/19)
-    group_diag4 =group_diag.copy()
-    group_diag4_ind_MDD = (group_diag4=='MDD').astype('int')
-    group_diag4_ind_GAD = (group_diag4=='GAD').astype('int')
-    group_diag4_ind_control_cdm = (group_diag4=='control_cdm').astype('int')
-    group_diag4_ind_control_mfmri = (group_diag4=='control_mfmri').astype('int')
 
     Bi1item_w_j_scaled = scale(Bi1item_w_j)
     Bi2item_w_j_scaled = scale(Bi2item_w_j)
     Bi3item_w_j_scaled = scale(Bi3item_w_j)
-    # Bi1item_subset_scaled = scale(Bi1item_subset)
-    # Bi2item_subset_scaled = scale(Bi2item_subset)
-    # Bi3item_subset_scaled = scale(Bi3item_subset)
-    # Oblimin2_1_scaled  = scale(Oblimin2_1)
-    # Oblimin2_2_scaled  = scale(Oblimin2_2)
-    # PCA_1_scaled  = scale(PCA_1)
-    # PCA_2_scaled  = scale(PCA_2)
-    # PCA_3_scaled  = scale(PCA_3)
-    # PCA_4_scaled  = scale(PCA_4)
-    # PCA_5_scaled  = scale(PCA_5)
-    # Oblimin3_1_scaled  = scale(Oblimin3_1)
-    # Oblimin3_2_scaled  = scale(Oblimin3_2)
-    # Oblimin3_3_scaled  = scale(Oblimin3_3)
-
 
     # useful splits of STAI
     STAI_scaled_both = STAI_scaled[0:len(MID_has_both)]
@@ -762,7 +676,6 @@ def get_data(dftmp,gen_data_path=None):
     MASQAA_scaled_rew_only = MASQAA_scaled[MID_rew_only_idx]
     MASQAA_scaled_pain_only = MASQAA_scaled[MID_pain_only_idx]
     MASQAA_scaled_all_unique = np.concatenate((MASQAA_scaled_both,MASQAA_scaled_rew_only,MASQAA_scaled_pain_only))
-
 
     STAI_nonscaled_both = STAI_nonscaled[0:len(MID_has_both)]
     STAI_nonscaled_rew_only = STAI_nonscaled[MID_rew_only_idx]
@@ -829,44 +742,6 @@ def get_data(dftmp,gen_data_path=None):
     group_diag_pain_only = group_diag[MID_pain_only_idx]
     group_diag_all_unique = np.concatenate((group_diag_both,group_diag_rew_only,group_diag_pain_only))
 
-    group_diag3_indicMDD_both =group_diag3_indicMDD[0:len(MID_has_both)]
-    group_diag3_indicMDD_rew_only = group_diag3_indicMDD[MID_rew_only_idx]
-    group_diag3_indicMDD_pain_only = group_diag3_indicMDD[MID_pain_only_idx]
-    group_diag3_indicMDD_all_unique = np.concatenate((group_diag3_indicMDD_both,
-    group_diag3_indicMDD_rew_only,group_diag3_indicMDD_rew_only))
-
-    group_diag3_indicGAD_both =group_diag3_indicGAD[0:len(MID_has_both)]
-    group_diag3_indicGAD_rew_only = group_diag3_indicGAD[MID_rew_only_idx]
-    group_diag3_indicGAD_pain_only = group_diag3_indicGAD[MID_pain_only_idx]
-    group_diag3_indicGAD_all_unique = np.concatenate((group_diag3_indicGAD_both,
-    group_diag3_indicGAD_rew_only,group_diag3_indicGAD_rew_only))
-
-    # More group splits
-    group_diag4_ind_MDD_both = group_diag4_ind_MDD[0:len(MID_has_both)]
-    group_diag4_ind_MDD_rew_only = group_diag4_ind_MDD[MID_rew_only_idx]
-    group_diag4_ind_MDD_pain_only = group_diag4_ind_MDD[MID_pain_only_idx]
-    group_diag4_ind_MDD_all_unique = np.concatenate((group_diag4_ind_MDD_both,
-    group_diag4_ind_MDD_rew_only,group_diag4_ind_MDD_pain_only))
-
-    group_diag4_ind_GAD_both = group_diag4_ind_GAD[0:len(MID_has_both)]
-    group_diag4_ind_GAD_rew_only = group_diag4_ind_GAD[MID_rew_only_idx]
-    group_diag4_ind_GAD_pain_only = group_diag4_ind_GAD[MID_pain_only_idx]
-    group_diag4_ind_GAD_all_unique = np.concatenate((group_diag4_ind_GAD_both,
-    group_diag4_ind_GAD_rew_only,group_diag4_ind_GAD_pain_only))
-
-    group_diag4_ind_control_cdm_both = group_diag4_ind_control_cdm[0:len(MID_has_both)]
-    group_diag4_ind_control_cdm_rew_only = group_diag4_ind_control_cdm[MID_rew_only_idx]
-    group_diag4_ind_control_cdm_pain_only = group_diag4_ind_control_cdm[MID_pain_only_idx]
-    group_diag4_ind_control_cdm_all_unique = np.concatenate((group_diag4_ind_control_cdm_both,
-    group_diag4_ind_control_cdm_rew_only,group_diag4_ind_control_cdm_pain_only))
-
-    group_diag4_ind_control_mfmri_both = group_diag4_ind_control_mfmri[0:len(MID_has_both)]
-    group_diag4_ind_control_mfmri_rew_only = group_diag4_ind_control_mfmri[MID_rew_only_idx]
-    group_diag4_ind_control_mfmri_pain_only = group_diag4_ind_control_mfmri[MID_pain_only_idx]
-    group_diag4_ind_control_mfmri_all_unique = np.concatenate((group_diag4_ind_control_mfmri_both,
-    group_diag4_ind_control_mfmri_rew_only,group_diag4_ind_control_mfmri_pain_only))
-
-
     # useful splits of other covariates
     Bi1item_w_j_scaled_both = Bi1item_w_j_scaled[0:len(MID_has_both)]
     Bi1item_w_j_scaled_rew_only = Bi1item_w_j_scaled[MID_rew_only_idx]
@@ -885,85 +760,6 @@ def get_data(dftmp,gen_data_path=None):
     Bi3item_w_j_scaled_pain_only = Bi3item_w_j_scaled[MID_pain_only_idx]
     Bi3item_w_j_scaled_all_unique = np.concatenate((Bi3item_w_j_scaled_both,
         Bi3item_w_j_scaled_rew_only,Bi3item_w_j_scaled_pain_only))
-
-    #
-    # Bi1item_subset_scaled_both = Bi1item_subset_scaled[0:len(MID_has_both)]
-    # Bi1item_subset_scaled_rew_only = Bi1item_subset_scaled[MID_rew_only_idx]
-    # Bi1item_subset_scaled_pain_only = Bi1item_subset_scaled[MID_pain_only_idx]
-    # Bi1item_subset_scaled_all_unique = np.concatenate((Bi1item_subset_scaled_both,
-    #     Bi1item_subset_scaled_rew_only,Bi1item_subset_scaled_pain_only))
-    #
-    # Bi2item_subset_scaled_both = Bi2item_subset_scaled[0:len(MID_has_both)]
-    # Bi2item_subset_scaled_rew_only = Bi2item_subset_scaled[MID_rew_only_idx]
-    # Bi2item_subset_scaled_pain_only = Bi2item_subset_scaled[MID_pain_only_idx]
-    # Bi2item_subset_scaled_all_unique = np.concatenate((Bi2item_subset_scaled_both,
-    #     Bi2item_subset_scaled_rew_only,Bi2item_subset_scaled_pain_only))
-    #
-    # Bi3item_subset_scaled_both = Bi3item_subset_scaled[0:len(MID_has_both)]
-    # Bi3item_subset_scaled_rew_only = Bi3item_subset_scaled[MID_rew_only_idx]
-    # Bi3item_subset_scaled_pain_only = Bi3item_subset_scaled[MID_pain_only_idx]
-    # Bi3item_subset_scaled_all_unique = np.concatenate((Bi3item_subset_scaled_both,
-    #     Bi3item_subset_scaled_rew_only,Bi3item_subset_scaled_pain_only))
-    #
-    # Oblimin2_1_scaled_both = Oblimin2_1_scaled[0:len(MID_has_both)]
-    # Oblimin2_1_scaled_rew_only = Oblimin2_1_scaled[MID_rew_only_idx]
-    # Oblimin2_1_scaled_pain_only = Oblimin2_1_scaled[MID_pain_only_idx]
-    # Oblimin2_1_scaled_all_unique = np.concatenate((Oblimin2_1_scaled_both,
-    #     Oblimin2_1_scaled_rew_only,Oblimin2_1_scaled_pain_only))
-    #
-    # Oblimin2_2_scaled_both = Oblimin2_2_scaled[0:len(MID_has_both)]
-    # Oblimin2_2_scaled_rew_only = Oblimin2_2_scaled[MID_rew_only_idx]
-    # Oblimin2_2_scaled_pain_only = Oblimin2_2_scaled[MID_pain_only_idx]
-    # Oblimin2_2_scaled_all_unique = np.concatenate((Oblimin2_2_scaled_both,
-    #     Oblimin2_2_scaled_rew_only,Oblimin2_2_scaled_pain_only))
-    #
-    # PCA_1_scaled_both = PCA_1_scaled[0:len(MID_has_both)]
-    # PCA_1_scaled_rew_only = PCA_1_scaled[MID_rew_only_idx]
-    # PCA_1_scaled_pain_only = PCA_1_scaled[MID_pain_only_idx]
-    # PCA_1_scaled_all_unique = np.concatenate((PCA_1_scaled_both,
-    #     PCA_1_scaled_rew_only,PCA_1_scaled_pain_only))
-    #
-    # PCA_2_scaled_both = PCA_2_scaled[0:len(MID_has_both)]
-    # PCA_2_scaled_rew_only = PCA_2_scaled[MID_rew_only_idx]
-    # PCA_2_scaled_pain_only = PCA_2_scaled[MID_pain_only_idx]
-    # PCA_2_scaled_all_unique = np.concatenate((PCA_2_scaled_both,
-    #     PCA_2_scaled_rew_only,PCA_2_scaled_pain_only))
-    #
-    # PCA_3_scaled_both = PCA_3_scaled[0:len(MID_has_both)]
-    # PCA_3_scaled_rew_only = PCA_3_scaled[MID_rew_only_idx]
-    # PCA_3_scaled_pain_only = PCA_3_scaled[MID_pain_only_idx]
-    # PCA_3_scaled_all_unique = np.concatenate((PCA_3_scaled_both,
-    #     PCA_3_scaled_rew_only,PCA_3_scaled_pain_only))
-    #
-    # PCA_4_scaled_both = PCA_4_scaled[0:len(MID_has_both)]
-    # PCA_4_scaled_rew_only = PCA_4_scaled[MID_rew_only_idx]
-    # PCA_4_scaled_pain_only = PCA_4_scaled[MID_pain_only_idx]
-    # PCA_4_scaled_all_unique = np.concatenate((PCA_4_scaled_both,
-    #     PCA_4_scaled_rew_only,PCA_4_scaled_pain_only))
-    #
-    # PCA_5_scaled_both = PCA_5_scaled[0:len(MID_has_both)]
-    # PCA_5_scaled_rew_only = PCA_5_scaled[MID_rew_only_idx]
-    # PCA_5_scaled_pain_only = PCA_5_scaled[MID_pain_only_idx]
-    # PCA_5_scaled_all_unique = np.concatenate((PCA_5_scaled_both,
-    #     PCA_5_scaled_rew_only,PCA_5_scaled_pain_only))
-    #
-    # Oblimin3_1_scaled_both = Oblimin3_1_scaled[0:len(MID_has_both)]
-    # Oblimin3_1_scaled_rew_only = Oblimin3_1_scaled[MID_rew_only_idx]
-    # Oblimin3_1_scaled_pain_only = Oblimin3_1_scaled[MID_pain_only_idx]
-    # Oblimin3_1_scaled_all_unique = np.concatenate((Oblimin3_1_scaled_both,
-    #     Oblimin3_1_scaled_rew_only,Oblimin3_1_scaled_pain_only))
-    #
-    # Oblimin3_2_scaled_both = Oblimin3_2_scaled[0:len(MID_has_both)]
-    # Oblimin3_2_scaled_rew_only = Oblimin3_2_scaled[MID_rew_only_idx]
-    # Oblimin3_2_scaled_pain_only = Oblimin3_2_scaled[MID_pain_only_idx]
-    # Oblimin3_2_scaled_all_unique = np.concatenate((Oblimin3_2_scaled_both,
-    #     Oblimin3_2_scaled_rew_only,Oblimin3_2_scaled_pain_only))
-    #
-    # Oblimin3_3_scaled_both = Oblimin3_3_scaled[0:len(MID_has_both)]
-    # Oblimin3_3_scaled_rew_only = Oblimin3_3_scaled[MID_rew_only_idx]
-    # Oblimin3_3_scaled_pain_only = Oblimin3_3_scaled[MID_pain_only_idx]
-    # Oblimin3_3_scaled_all_unique = np.concatenate((Oblimin3_3_scaled_both,
-    #     Oblimin3_3_scaled_rew_only,Oblimin3_3_scaled_pain_only))
 
     data['STAI_scaled']=STAI_scaled
     data['STAI_scaled_both']=STAI_scaled_both
@@ -1048,42 +844,6 @@ def get_data(dftmp,gen_data_path=None):
     data['group_p_c_dindic_rew_only']=group_p_c_dindic_rew_only
     data['group_p_c_dindic_all_unique']=group_p_c_dindic_all_unique
 
-    data['group_diag3_indicGAD']=group_diag3_indicGAD
-    data['group_diag3_indicGAD_both']=group_diag3_indicGAD_both
-    data['group_diag3_indicGAD_pain_only']=group_diag3_indicGAD_pain_only
-    data['group_diag3_indicGAD_rew_only']=group_diag3_indicGAD_rew_only
-    data['group_diag3_indicGAD_all_unique']=group_diag3_indicGAD_rew_only
-
-    data['group_diag3_indicMDD']=group_diag3_indicMDD
-    data['group_diag3_indicMDD_both']=group_diag3_indicMDD_both
-    data['group_diag3_indicMDD_pain_only']=group_diag3_indicMDD_pain_only
-    data['group_diag3_indicMDD_rew_only']=group_diag3_indicMDD_rew_only
-    data['group_diag3_indicMDD_all_unique']=group_diag3_indicMDD_rew_only
-
-    data['group_diag4_ind_GAD']=group_diag4_ind_GAD
-    data['group_diag4_ind_GAD_both']=group_diag4_ind_GAD_both
-    data['group_diag4_ind_GAD_pain_only']=group_diag4_ind_GAD_pain_only
-    data['group_diag4_ind_GAD_rew_only']=group_diag4_ind_GAD_rew_only
-    data['group_diag4_ind_GAD_all_unique']=group_diag4_ind_GAD_all_unique
-
-    data['group_diag4_ind_MDD']=group_diag4_ind_MDD
-    data['group_diag4_ind_MDD_both']=group_diag4_ind_MDD_both
-    data['group_diag4_ind_MDD_pain_only']=group_diag4_ind_MDD_pain_only
-    data['group_diag4_ind_MDD_rew_only']=group_diag4_ind_MDD_rew_only
-    data['group_diag4_ind_MDD_all_unique']=group_diag4_ind_MDD_all_unique
-
-    data['group_diag4_ind_control_cdm']=group_diag4_ind_control_cdm
-    data['group_diag4_ind_control_cdm_both']=group_diag4_ind_control_cdm_both
-    data['group_diag4_ind_control_cdm_pain_only']=group_diag4_ind_control_cdm_pain_only
-    data['group_diag4_ind_control_cdm_rew_only']=group_diag4_ind_control_cdm_rew_only
-    data['group_diag4_ind_control_cdm_all_unique']=group_diag4_ind_control_cdm_all_unique
-
-    data['group_diag4_ind_control_mfmri']=group_diag4_ind_control_mfmri
-    data['group_diag4_ind_control_mfmri_both']=group_diag4_ind_control_mfmri_both
-    data['group_diag4_ind_control_mfmri_pain_only']=group_diag4_ind_control_mfmri_pain_only
-    data['group_diag4_ind_control_mfmri_rew_only']=group_diag4_ind_control_mfmri_rew_only
-    data['group_diag4_ind_control_mfmri_all_unique']=group_diag4_ind_control_mfmri_all_unique
-
     data['Bi1item_w_j_scaled']=Bi1item_w_j_scaled
     data['Bi1item_w_j_scaled_both']=Bi1item_w_j_scaled_both
     data['Bi1item_w_j_scaled_pain_only']=Bi1item_w_j_scaled_pain_only
@@ -1101,84 +861,6 @@ def get_data(dftmp,gen_data_path=None):
     data['Bi3item_w_j_scaled_pain_only']=Bi3item_w_j_scaled_pain_only
     data['Bi3item_w_j_scaled_rew_only']=Bi3item_w_j_scaled_rew_only
     data['Bi3item_w_j_scaled_all_unique']=Bi3item_w_j_scaled_all_unique
-
-    # data['Bi1item_subset_scaled']=Bi1item_subset_scaled
-    # data['Bi1item_subset_scaled_both']=Bi1item_subset_scaled_both
-    # data['Bi1item_subset_scaled_pain_only']=Bi1item_subset_scaled_pain_only
-    # data['Bi1item_subset_scaled_rew_only']=Bi1item_subset_scaled_rew_only
-    # data['Bi1item_subset_scaled_all_unique']=Bi1item_subset_scaled_all_unique
-    #
-    # data['Bi2item_subset_scaled']=Bi2item_subset_scaled
-    # data['Bi2item_subset_scaled_both']=Bi2item_subset_scaled_both
-    # data['Bi2item_subset_scaled_pain_only']=Bi2item_subset_scaled_pain_only
-    # data['Bi2item_subset_scaled_rew_only']=Bi2item_subset_scaled_rew_only
-    # data['Bi2item_subset_scaled_all_unique']=Bi2item_subset_scaled_all_unique
-    #
-    # data['Bi3item_subset_scaled']=Bi3item_subset_scaled
-    # data['Bi3item_subset_scaled_both']=Bi3item_subset_scaled_both
-    # data['Bi3item_subset_scaled_pain_only']=Bi3item_subset_scaled_pain_only
-    # data['Bi3item_subset_scaled_rew_only']=Bi3item_subset_scaled_rew_only
-    # data['Bi3item_subset_scaled_all_unique']=Bi3item_subset_scaled_all_unique
-    #
-    # data['Oblimin2_1_scaled']=Oblimin2_1_scaled
-    # data['Oblimin2_1_scaled_both']=Oblimin2_1_scaled_both
-    # data['Oblimin2_1_scaled_pain_only']=Oblimin2_1_scaled_pain_only
-    # data['Oblimin2_1_scaled_rew_only']=Oblimin2_1_scaled_rew_only
-    # data['Oblimin2_1_scaled_all_unique']=Oblimin2_1_scaled_all_unique
-    #
-    # data['Oblimin2_2_scaled']=Oblimin2_2_scaled
-    # data['Oblimin2_2_scaled_both']=Oblimin2_2_scaled_both
-    # data['Oblimin2_2_scaled_pain_only']=Oblimin2_2_scaled_pain_only
-    # data['Oblimin2_2_scaled_rew_only']=Oblimin2_2_scaled_rew_only
-    # data['Oblimin2_2_scaled_all_unique']=Oblimin2_2_scaled_all_unique
-    #
-    # data['PCA_1_scaled']=PCA_1_scaled
-    # data['PCA_1_scaled_both']=PCA_1_scaled_both
-    # data['PCA_1_scaled_pain_only']=PCA_1_scaled_pain_only
-    # data['PCA_1_scaled_rew_only']=PCA_1_scaled_rew_only
-    # data['PCA_1_scaled_all_unique']=PCA_1_scaled_all_unique
-    #
-    # data['PCA_2_scaled']=PCA_2_scaled
-    # data['PCA_2_scaled_both']=PCA_2_scaled_both
-    # data['PCA_2_scaled_pain_only']=PCA_2_scaled_pain_only
-    # data['PCA_2_scaled_rew_only']=PCA_2_scaled_rew_only
-    # data['PCA_2_scaled_all_unique']=PCA_2_scaled_all_unique
-    #
-    # data['PCA_3_scaled']=PCA_3_scaled
-    # data['PCA_3_scaled_both']=PCA_3_scaled_both
-    # data['PCA_3_scaled_pain_only']=PCA_3_scaled_pain_only
-    # data['PCA_3_scaled_rew_only']=PCA_3_scaled_rew_only
-    # data['PCA_3_scaled_all_unique']=PCA_3_scaled_all_unique
-    #
-    # data['PCA_4_scaled']=PCA_4_scaled
-    # data['PCA_4_scaled_both']=PCA_4_scaled_both
-    # data['PCA_4_scaled_pain_only']=PCA_4_scaled_pain_only
-    # data['PCA_4_scaled_rew_only']=PCA_4_scaled_rew_only
-    # data['PCA_4_scaled_all_unique']=PCA_4_scaled_all_unique
-    #
-    # data['PCA_5_scaled']=PCA_5_scaled
-    # data['PCA_5_scaled_both']=PCA_5_scaled_both
-    # data['PCA_5_scaled_pain_only']=PCA_5_scaled_pain_only
-    # data['PCA_5_scaled_rew_only']=PCA_5_scaled_rew_only
-    # data['PCA_5_scaled_all_unique']=PCA_5_scaled_all_unique
-    #
-    # data['Oblimin3_1_scaled']=Oblimin3_1_scaled
-    # data['Oblimin3_1_scaled_both']=Oblimin3_1_scaled_both
-    # data['Oblimin3_1_scaled_pain_only']=Oblimin3_1_scaled_pain_only
-    # data['Oblimin3_1_scaled_rew_only']=Oblimin3_1_scaled_rew_only
-    # data['Oblimin3_1_scaled_all_unique']=Oblimin3_1_scaled_all_unique
-    #
-    # data['Oblimin3_2_scaled']=Oblimin3_2_scaled
-    # data['Oblimin3_2_scaled_both']=Oblimin3_2_scaled_both
-    # data['Oblimin3_2_scaled_pain_only']=Oblimin3_2_scaled_pain_only
-    # data['Oblimin3_2_scaled_rew_only']=Oblimin3_2_scaled_rew_only
-    # data['Oblimin3_2_scaled_all_unique']=Oblimin3_2_scaled_all_unique
-    #
-    # data['Oblimin3_3_scaled']=Oblimin3_3_scaled
-    # data['Oblimin3_3_scaled_both']=Oblimin3_3_scaled_both
-    # data['Oblimin3_3_scaled_pain_only']=Oblimin3_3_scaled_pain_only
-    # data['Oblimin3_3_scaled_rew_only']=Oblimin3_3_scaled_rew_only
-    # data['Oblimin3_3_scaled_all_unique']=Oblimin3_3_scaled_all_unique
 
     # Create questionnaires with g residualized out.
     scales = ['PSWQ_nonscaled_all_unique','MASQAA_nonscaled_all_unique','MASQAD_nonscaled_all_unique',
@@ -1203,16 +885,6 @@ def get_data(dftmp,gen_data_path=None):
         data[q_stem+'_scaled_residG_both']=e[0:len(MID_has_both)]
         data[q_stem+'_scaled_residG_rew_only']=e[tmp_rew_only_idx]
         data[q_stem+'_scaled_residG_pain_only']=e[tmp_pain_only_idx]
-
-        # # residualize out PC1
-        # x = data['PCA_1_scaled_all_unique'] # general factor
-        # X = sm.add_constant(x)
-        # results = sm.OLS(y,X).fit()
-        # e = scale(results.resid) # standardize residuals
-        # data[q_stem+'_scaled_residPC1_all_unique']=e
-        # data[q_stem+'_scaled_residPC1_both']=e[0:len(MID_has_both)]
-        # data[q_stem+'_scaled_residPC1_rew_only']=e[tmp_rew_only_idx]
-        # data[q_stem+'_scaled_residPC1_pain_only']=e[tmp_pain_only_idx]
 
     return(data)
 
@@ -1378,9 +1050,6 @@ def get_data_online(dftmp):
     # load in factor analysis stuff
     try:
         scores_df_bi3_noASI_w_janines = pd.read_csv(BASEDIR+'fitting_bifactor_model/bifactor_exp1_poly_scores_exp2.csv')
-        #scores_df_oblimin2 = pd.read_csv(BASEDIR+'bifactor_analysis/oblimin2_scores.csv')
-        #scores_df_oblimin2 = pd.read_csv(BASEDIR+'bifactor_analysis/oblimin2_o_scores_bartlett.csv')
-        #scores_df_pca5 = pd.read_csv(BASEDIR+'bifactor_analysis/pca5_scores.csv')
     except:
         # place holder until factor analysis is run
         MID_combined_temp  = ['X'+MID if len(MID)==4 else MID for MID in MID_combined]
@@ -1388,18 +1057,7 @@ def get_data_online(dftmp):
                                                         'g':np.ones(len(MID_combined)),
                                                         'F1.':np.ones(len(MID_combined)),
                                                         'F2.':np.ones(len(MID_combined))})
-        # scores_df_oblimin2 = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                             'F1':np.ones(len(STAI)),
-        #                                             'F2':np.ones(len(STAI))})
-        # scores_df_pca5 = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
-        #                                                 'PA1':np.ones(len(STAI)),
-        #                                                 'PA2':np.ones(len(STAI)),
-        #                                                 'PA3':np.ones(len(STAI)),
-        #                                                 'PA4':np.ones(len(STAI)),
-        #                                                 'PA5':np.ones(len(STAI))})
     scores_df_bi3_noASI_w_janines=scores_df_bi3_noASI_w_janines.rename(columns={'Unnamed: 0':'MID'})
-    #scores_df_oblimin2=scores_df_oblimin2.rename(columns={'Unnamed: 0':'MID','PA1':'F1','PA2':'F2'})
-    #scores_df_pca5=scores_df_pca5.rename(columns={'Unnamed: 0':'MID'})
 
 
     # Covariates
@@ -1418,26 +1076,19 @@ def get_data_online(dftmp):
     Bi1item_w_j = []
     Bi2item_w_j = []
     Bi3item_w_j = []
-    # Oblimin2_1 = []
-    # Oblimin2_2 = []
-    # PCA_1 = []
-    # PCA_2 = []
-    # PCA_3 = []
-    # PCA_4 = []
-    # PCA_5 = []
 
     for MID in MID_combined:
-        STAI.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait_x'].values[0])
-        STAIanx.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait_anx_x'].values[0])
-        STAIdep.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait_dep_x'].values[0])
-        MASQAS.append(dftmp.loc[dftmp.MID==MID,'MASQ.AS_x'].values[0])
-        MASQAD.append(dftmp.loc[dftmp.MID==MID,'MASQ.AD_x'].values[0])
-        MASQDS.append(dftmp.loc[dftmp.MID==MID,'MASQ.DS_x'].values[0])
-        MASQAA.append(dftmp.loc[dftmp.MID==MID,'MASQ.AA_x'].values[0])
-        PSWQ.append(dftmp.loc[dftmp.MID==MID,'PSWQ_x'].values[0])
-        CESD.append(dftmp.loc[dftmp.MID==MID,'CESD_x'].values[0])
-        BDI.append(dftmp.loc[dftmp.MID==MID,'BDI_x'].values[0])
-        EPQN.append(dftmp.loc[dftmp.MID==MID,'EPQ.N_x'].values[0])
+        STAI.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait'].values[0])
+        STAIanx.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait_anx'].values[0])
+        STAIdep.append(dftmp.loc[dftmp.MID==MID,'STAI_Trait_dep'].values[0])
+        MASQAS.append(dftmp.loc[dftmp.MID==MID,'MASQ.AS'].values[0])
+        MASQAD.append(dftmp.loc[dftmp.MID==MID,'MASQ.AD'].values[0])
+        MASQDS.append(dftmp.loc[dftmp.MID==MID,'MASQ.DS'].values[0])
+        MASQAA.append(dftmp.loc[dftmp.MID==MID,'MASQ.AA'].values[0])
+        PSWQ.append(dftmp.loc[dftmp.MID==MID,'PSWQ'].values[0])
+        CESD.append(dftmp.loc[dftmp.MID==MID,'CESD'].values[0])
+        BDI.append(dftmp.loc[dftmp.MID==MID,'BDI'].values[0])
+        EPQN.append(dftmp.loc[dftmp.MID==MID,'EPQ.N'].values[0])
 
         if len(MID)==4:
             MID = 'X'+MID
@@ -1445,13 +1096,6 @@ def get_data_online(dftmp):
         Bi1item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'g'].values[0])
         Bi2item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'F1.'].values[0])
         Bi3item_w_j.append(scores_df_bi3_noASI_w_janines.loc[scores_df_bi3_noASI_w_janines.MID==MID,'F2.'].values[0]) ##
-        # Oblimin2_1.append(scores_df_oblimin2.loc[scores_df_oblimin2.MID==MID,'F1'].values[0])
-        # Oblimin2_2.append(scores_df_oblimin2.loc[scores_df_oblimin2.MID==MID,'F2'].values[0])
-        # PCA_1.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC1'].values[0])
-        # PCA_2.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC2'].values[0])
-        # PCA_3.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC3'].values[0])
-        # PCA_4.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC4'].values[0])
-        # PCA_5.append(scores_df_pca5.loc[scores_df_pca5.MID==MID,'PC5'].values[0])
 
     STAI=np.array(STAI)
     STAIanx=np.array(STAIanx)
@@ -1468,13 +1112,6 @@ def get_data_online(dftmp):
     Bi1item_w_j = np.array(Bi1item_w_j)
     Bi2item_w_j = np.array(Bi2item_w_j)
     Bi3item_w_j = np.array(Bi3item_w_j)
-    # Oblimin2_1  = np.array(Oblimin2_1)
-    # Oblimin2_2  = np.array(Oblimin2_2)
-    # PCA_1  = np.array(PCA_1)
-    # PCA_2  = np.array(PCA_2)
-    # PCA_3  = np.array(PCA_3)
-    # PCA_4  = np.array(PCA_4)
-    # PCA_5  = np.array(PCA_5)
 
     # Normalize covariates (across everyone)
     STAI_scaled = scale(STAI.astype('float'))
@@ -1501,13 +1138,6 @@ def get_data_online(dftmp):
     Bi1item_w_j_scaled = scale(Bi1item_w_j)
     Bi2item_w_j_scaled = scale(Bi2item_w_j)
     Bi3item_w_j_scaled = scale(Bi3item_w_j)
-    # Oblimin2_1_scaled  = scale(Oblimin2_1)
-    # Oblimin2_2_scaled  = scale(Oblimin2_2)
-    # PCA_1_scaled  = scale(PCA_1)
-    # PCA_2_scaled  = scale(PCA_2)
-    # PCA_3_scaled  = scale(PCA_3)
-    # PCA_4_scaled  = scale(PCA_4)
-    # PCA_5_scaled  = scale(PCA_5)
 
     # useful splits of STAI
     STAI_scaled_both = STAI_scaled[0:len(MID_has_both)]
@@ -1533,14 +1163,6 @@ def get_data_online(dftmp):
     Bi1item_w_j_scaled_both = Bi1item_w_j_scaled[0:len(MID_has_both)]
     Bi2item_w_j_scaled_both = Bi2item_w_j_scaled[0:len(MID_has_both)]
     Bi3item_w_j_scaled_both = Bi3item_w_j_scaled[0:len(MID_has_both)]
-    # Oblimin2_1_scaled_both = Oblimin2_1_scaled[0:len(MID_has_both)]
-    # Oblimin2_2_scaled_both = Oblimin2_2_scaled[0:len(MID_has_both)]
-    #
-    # PCA_1_scaled_both = PCA_1_scaled[0:len(MID_has_both)]
-    # PCA_2_scaled_both = PCA_2_scaled[0:len(MID_has_both)]
-    # PCA_3_scaled_both = PCA_3_scaled[0:len(MID_has_both)]
-    # PCA_4_scaled_both = PCA_4_scaled[0:len(MID_has_both)]
-    # PCA_5_scaled_both = PCA_5_scaled[0:len(MID_has_both)]
 
     data['STAI']=STAI
     data['STAI_both']=STAI[0:len(MID_has_both)]
@@ -1569,15 +1191,6 @@ def get_data_online(dftmp):
     data['Bi2item_w_j_scaled_both']=Bi2item_w_j_scaled_both
     data['Bi3item_w_j_scaled_both']=Bi3item_w_j_scaled_both
 
-    # data['PCA_1_scaled_both']=PCA_1_scaled_both
-    # data['PCA_2_scaled_both']=PCA_2_scaled_both
-    # data['PCA_3_scaled_both']=PCA_3_scaled_both
-    # data['PCA_4_scaled_both']=PCA_4_scaled_both
-    # data['PCA_5_scaled_both']=PCA_5_scaled_both
-    #
-    # data['Oblimin2_1_scaled_both']=Oblimin2_1_scaled_both
-    # data['Oblimin2_2_scaled_both']=Oblimin2_2_scaled_both
-
     data['STAI_scaled_all_unique']=STAI_scaled_both
     data['STAI_nonscaled']=STAI_nonscaled
     data['STAIanx_scaled_all_unique']=STAIanx_scaled_both
@@ -1597,15 +1210,6 @@ def get_data_online(dftmp):
     data['Bi1item_w_j_scaled_all_unique']=Bi1item_w_j_scaled_both
     data['Bi2item_w_j_scaled_all_unique']=Bi2item_w_j_scaled_both
     data['Bi3item_w_j_scaled_all_unique']=Bi3item_w_j_scaled_both
-    #
-    # data['Oblimin2_1_scaled_all_unique']=Oblimin2_1_scaled_both
-    # data['Oblimin2_2_scaled_all_unique']=Oblimin2_2_scaled_both
-    #
-    # data['PCA_1_scaled_all_unique']=PCA_1_scaled_both
-    # data['PCA_2_scaled_all_unique']=PCA_2_scaled_both
-    # data['PCA_3_scaled_all_unique']=PCA_3_scaled_both
-    # data['PCA_4_scaled_all_unique']=PCA_4_scaled_both
-    # data['PCA_5_scaled_all_unique']=PCA_5_scaled_both
 
     #Create questionnaires with g residualized out.
     scales = ['PSWQ_nonscaled_all_unique','MASQAA_nonscaled_all_unique','MASQAD_nonscaled_all_unique',
@@ -1622,75 +1226,30 @@ def get_data_online(dftmp):
         data[q_stem+'_scaled_residG_all_unique']=e
         data[q_stem+'_scaled_residG_both']=e
 
-        # # residualize out PC1
-        # x = data['PCA_1_scaled_all_unique'] # general factor
-        # X = sm.add_constant(x)
-        # results = sm.OLS(y,X).fit()
-        # e = scale(results.resid) # standardize residuals
-        # data[q_stem+'_scaled_residPC1_all_unique']=e
-        # data[q_stem+'_scaled_residPC1_both']=e
-
-    # add task order
-    # data['task_order_long'] = np.load('../data/amt_task_order_long.npy')
-    # data['task_order_short'] = np.load('../data/amt_task_order_short.npy')
-
     return data
 
 
 def scale(X, axis=0, with_mean=True, with_std=True, copy=True):
     X = X.copy()
     X = np.asarray(X)
+    X = X.astype('float')
 
     if with_mean:
         mean_ = np.nanmean(X, axis)
     if with_std:
         scale_ = np.nanstd(X, axis)
-    # Xr is a view on the original array that enables easy use of
-    # broadcasting on the axis in which we are interested in
+
     Xr = np.rollaxis(X, axis)
     if with_mean:
         Xr -= mean_
         mean_1 = np.nanmean(Xr, axis=0)
-        # Verify that mean_1 is 'close to zero'. If X contains very
-        # large values, mean_1 can also be very large, due to a lack of
-        # precision of mean_. In this case, a pre-scaling of the
-        # concerned feature is efficient, for instance by its mean or
-        # maximum.
         if not np.allclose(mean_1, 0):
-            #pass
-            # print("Numerical issues were encountered "
-            #               "when centering the data "
-            #               "and might not be solved. Dataset may "
-            #               "contain too large values. You may need "
-            #               "to prescale your features.")
             Xr -= mean_1
     if with_std:
-        scale_ = scale_ #_handle_zeros_in_scale(scale_, copy=False)
+        scale_ = scale_
         Xr /= scale_
         if with_mean:
             mean_2 = np.nanmean(Xr, axis=0)
-            # If mean_2 is not 'close to zero', it comes from the fact that
-            # scale_ is very small so that mean_2 = mean_1/scale_ > 0, even
-            # if mean_1 was close to zero. The problem is thus essentially
-            # due to the lack of precision of mean_. A solution is then to
-            # subtract the mean again:
             if not np.allclose(mean_2, 0):
-                #pass
-                # print("Numerical issues were encountered "
-                #               "when scaling the data "
-                #               "and might not be solved. The standard "
-                #               "deviation of the data is probably "
-                #               "very close to 0. ")
                 Xr -= mean_2
     return X
-
-###############
-# Some checks #
-
-# Nonscaled and Scaled Match Up #
-
-# for stem in ['MASQAA','MASQAD','STAIanx','STAIdep','PSWQ','STAI','BDI']:
-#     plt.figure()
-#     #plt.scatter(data[stem+'_scaled_all_unique'],data[stem+'_nonscaled_all_unique'])
-#     plt.scatter(data[stem+'_scaled_both'],data[stem+'_nonscaled_all_unique'][0:len(data['MID_has_both'])])
-#     #plt.scatter(data_online[stem+'_scaled_both'],data_online[stem+'_nonscaled_both'])
