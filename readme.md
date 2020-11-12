@@ -51,6 +51,8 @@ conda install statsmodels
 
 Note that most Jupyter notebooks should be run using this Python environment. The only exception is the Bifactor modeling notebook.
 
+To activate the environments use `conda activate pymc3_3.6` or `conda activate env_r`. To switch between environments, use `conda deactivate`. 
+
 ## (4) Fitting the Bifactor to Internalizing Questionnaire Data (Optional)
 
 Participants' item-level response data, which is fit by the bifactor model, can be found in the folder: `/data/item_level_data_for_bifactor_analysis`. The files with the prefix "Q_items" contain item-level responses, and the files with the prefix "Q_labels" contain the associated questions and questionnaire labels. Separate files correspond to a different groups of subjects: experiment 1, the confirmatory analysis, or experiment 2 (see the paper for more details on these separate groups).
