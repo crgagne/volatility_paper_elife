@@ -22,7 +22,7 @@ import numpy as np
 import pickle
 import pandas as pd
 
-from model_base2 import create_sel
+from model_base import create_sel
 from choice_fun import *
 from update_fun import *
 
@@ -42,6 +42,7 @@ def trial_step(info_tm1_A,info_t_A, # externally provided to function on each tr
             choice_val_tm1,
             estimate_tm1_A, #
             estimate_tm1_B,
+            Ga_tm1,Ba_tm1,Gb_tm1,Bb_tm1,
             choice_kernel_tm1,
             lr_tm1,lr_c_tm1,Amix_tm1,Binv_tm1,Bc_tm1,decay_tm1,mdiff_tm1,eps_tm1,
             lr_baseline,lr_goodbad,lr_stabvol,lr_rewpain, # variables accessible on all trials
@@ -157,6 +158,7 @@ def trial_step(info_tm1_A,info_t_A, # externally provided to function on each tr
         #rng_val.seed(seed.value)                         # seeds the generator
         #choice_t.rng.set_value(rng_val, borrow=True)
 
+
     # determine whether current trial is good or bad
     outcome_valence_t = choice_t*info_t_A +\
                  (1.0-choice_t)*(info_t_B) +\
@@ -173,13 +175,8 @@ def trial_step(info_tm1_A,info_t_A, # externally provided to function on each tr
         stabvol_t*rewpain_t*lr_rewpain_stabvol + \
         outcome_valence_t*stabvol_t*rewpain_t*lr_rewpain_goodbad_stabvol
 
-    lr_t = pm.invlogit(lr_t)
-
-    # update probability estimate, These will be estimate after update on t
-    # stored differently than before
-    # update the probability estimates of the shape chosen
-    estimate_t_A = estimate_tm1_A + lr_t*(info_t_A-estimate_tm1_A)*choice_t
-    estimate_t_B = estimate_tm1_B + lr_t*(info_t_B-estimate_tm1_B)*(1-choice_t)
+    #lr_t = pm.invlogit(lr_t)
+    lr_t = pm.invlogit(lr_t)*5
 
     # determine decay on current trial
     decay_t = decay_baseline + \
@@ -189,9 +186,17 @@ def trial_step(info_tm1_A,info_t_A, # externally provided to function on each tr
 
     decay_t = pm.invlogit(decay_t)
 
-    # decay both
-    estimate_t_A = estimate_t_A + decay_t*(0.5-estimate_t_A)
-    estimate_t_B = estimate_t_B + decay_t*(0.5-estimate_t_B)
+
+    # update the Beta Parameters
+    Ga_t = decay_t*Ga_tm1 + lr_t*(choice_t*info_t_A)
+    Ba_t = decay_t*Ba_tm1 + lr_t*(choice_t*(1-info_t_A))
+
+    Gb_t = decay_t*Gb_tm1 + lr_t*((1-choice_t)*(info_t_B)) # chose B and B rewarded
+    Bb_t = decay_t*Bb_tm1 + lr_t*((1-choice_t)*(1-info_t_B))    # chose B and B not rewarded
+
+    # update the probability estimates of the shape chosen
+    estimate_t_A = (Ga_t+1) / (Ga_t + Ba_t + 2)
+    estimate_t_B = (Gb_t+1) / (Gb_t + Bb_t + 2)
 
 
     # Choice kernel learning rate
@@ -208,7 +213,7 @@ def trial_step(info_tm1_A,info_t_A, # externally provided to function on each tr
 
     choice_kernel_t =  choice_kernel_tm1 + lr_c_t*(choice_t - choice_kernel_tm1)
 
-    return([choice_t,outcome_valence_t,prob_choice_t,choice_val_t,estimate_t_A,estimate_t_B,choice_kernel_t,lr_t,lr_c_t,Amix_t,Binv_t,Bc_t,decay_t,mdiff_t,eps_t])
+    return([choice_t,outcome_valence_t,prob_choice_t,choice_val_t,estimate_t_A,estimate_t_B,Ga_t,Ba_t,Gb_t,Bb_t,choice_kernel_t,lr_t,lr_c_t,Amix_t,Binv_t,Bc_t,decay_t,mdiff_t,eps_t])
 
 
 
@@ -376,13 +381,18 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
     starting_choice_kernel = T.ones(NN)*0.5
     starting_mdiff= T.ones(NN)*0.2
     starting_decay = T.ones(NN)*0.5
+    starting_Ga = T.ones(NN)
+    starting_Ba = T.ones(NN)
+    starting_Gb = T.ones(NN)
+    starting_Bb = T.ones(NN)
     starting_eps = T.ones(NN)*0.2
 
     (choice,outcome_valence,prob_choice,choice_val,estimate_r_A,estimate_r_B,
-    choice_kernel,
+    Ga_t,Ba_t,Gb_t,Bb_t,choice_kernel,
     lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates = theano.scan(fn=trial_step,
                                             outputs_info=[starting_choice,starting_outcome_valence, # observables
                                                 starting_prob_choice,starting_choice_val,starting_estimate_r_A,starting_estimate_r_B,
+                                                starting_Ga,starting_Ba,starting_Gb,starting_Bb,
                                                 starting_choice_kernel,
                                                 starting_lr,starting_lr_c,starting_Amix,starting_Binv,starting_Bc,starting_decay,starting_mdiff,starting_eps], # note that outcome c flipped are outcome A is assigned good outcome; should be called info
                                             sequences=[dict(input=T.as_tensor_variable(np.vstack((np.ones(NN),X['outcomes_c_flipped']))),taps=[-1,0]),
@@ -416,7 +426,7 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
                                                       strict=True)
 
 
-    return((choice,outcome_valence,prob_choice,choice_val,estimate_r_A,estimate_r_B,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates)
+    return((choice,outcome_valence,prob_choice,choice_val,estimate_r_A,estimate_r_B,Ga_t,Ba_t,Gb_t,Bb_t,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates)
 
 
 
@@ -444,7 +454,7 @@ def combined_prior_model_to_choice_model(X,Y,param_names,model,
 
         (choice,outcome_valence,
         prob_choice,choice_val,
-        estimate_r_A,estimate_r_B,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates = create_choice_model(X,Y,param_names,model.Theta,gen_indicator=0,B_max=B_max)
+        estimate_r_A,estimate_r_B,Ga,Ba,Gb,Bb,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates = create_choice_model(X,Y,param_names,model.Theta,gen_indicator=0,B_max=B_max)
 
         if save_state_variables:
             estimate_r_A = pm.Deterministic('estimate_r_A',estimate_r_A)
@@ -461,6 +471,10 @@ def combined_prior_model_to_choice_model(X,Y,param_names,model,
             Bc = pm.Deterministic('Bc',Bc)
             mdiff = pm.Deterministic('mdiff',mdiff)
             decay  =  pm.Deterministic('decay',decay)
+            Ga = pm.Deterministic('Ga',Ga)
+            Ba = pm.Deterministic('Ba',Ba)
+            Gb = pm.Deterministic('Gb',Gb)
+            Bb = pm.Deterministic('Bb',Bb)
             eps = pm.Deterministic('eps',eps)
 
         observed_choice = pm.Bernoulli('observed_choice',p=prob_choice,
@@ -484,7 +498,7 @@ def create_gen_choice_model(X,Y,param_names,B_max=10.0,seed=1,nonlinear_indicato
 
     (choice,outcome_valence,
     prob_choice,choice_val,
-    estimate_r_A,estimate_t_B,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates = create_choice_model(X,Y,param_names,Theta,gen_indicator=1,B_max=B_max)
+    estimate_r_A,estimate_t_B,Ga,Ba,Gb,Bb,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps), updates = create_choice_model(X,Y,param_names,Theta,gen_indicator=1,B_max=B_max)
 
     # set random seed when compiling the function
     shared_random_stream = [u for u in updates][0] # don't know how to unpack otherwise; returns a RandomStateSharedVariable which has a random state
@@ -495,6 +509,6 @@ def create_gen_choice_model(X,Y,param_names,B_max=10.0,seed=1,nonlinear_indicato
     f = theano.function([Theta],
     [choice,outcome_valence,
     prob_choice,choice_val,
-    estimate_r_A,estimate_t_B,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps],updates=updates)#no_default_updates=True)
+    estimate_r_A,estimate_t_B,Ga,Ba,Gb,Bb,choice_kernel,lr,lr_c,Amix,Binv,Bc,decay,mdiff,eps],updates=updates)#no_default_updates=True)
 
     return(f)

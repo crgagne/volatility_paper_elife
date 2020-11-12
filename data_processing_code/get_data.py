@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import pandas as pd
 import datetime
@@ -8,16 +6,16 @@ import copy
 from exclude import EXCLUDE_PAIN,EXCLUDE_REW
 from scipy.stats import pearsonr,spearmanr,ttest_1samp
 import statsmodels.api as sm
-#from sklearn.preprocessing import scale
 import os
 
 BASEDIR = '../'
 
-
 ##############################
 ### load data single subj ####
 def load_data(datafile_name,exclude=None,MID=None):
-    '''load a single subject datafile'''
+    '''This is called by other functions.
+
+    '''
 
     data = pd.read_csv(datafile_name)
 
@@ -75,7 +73,7 @@ def load_data(datafile_name,exclude=None,MID=None):
 
 
 def get_block(array,block_idx,block=1):
-    '''just selects rows corresponding to block=1 or block=2
+    '''This is called by other functions.
 
     Inputs:
     --------
@@ -107,14 +105,10 @@ def load_dataset(task,
     exclude=[0,1,2,3,4,5,6,7,8,9,90,91,92,93,94,95,96,97,98,99],
     MIDSin=None):
     '''
-    Not called directly.
+    This is called by other functions.
 
-    Inputs:
-    -------
-        how many: 'all'|int
-            will be multiplied by the number of folders
     '''
-    #import pdb; pdb.set_trace()
+
     outcomes = []
     mag_1 = []
     mag_0 = []
@@ -124,7 +118,6 @@ def load_dataset(task,
     vols = []
     MIDS = []
     dataset = []
-
 
     for folder in folders:
 
@@ -201,7 +194,6 @@ def load_dataset(task,
     out['outcomes_del']=outcomes_del
     out['vols']=vols
     out['block']=block
-    #import pdb; pdb.set_trace()
 
     # split by block
     outcomes_stable = get_block(outcomes,block,block=1)
@@ -242,13 +234,13 @@ def load_dataset(task,
     return(out)
 
 
-
 ##################################
 ### load experiment 1 dataset ####
 
 def get_data(dftmp,gen_data_path=None):
+    ''' This is called directly to load experiment 1 data.
 
-    '''Get's the data 157 subject_task by trial'''
+    '''
     data ={}
 
     # get list of MIDS
@@ -303,7 +295,6 @@ def get_data(dftmp,gen_data_path=None):
         exclude=None,
         MIDSin=MID_has_both)
 
-
     folders = [BASEDIR+'data/data_raw_exp1/']
     out_pain_pain_only = load_dataset('pain',
         folders,
@@ -312,7 +303,6 @@ def get_data(dftmp,gen_data_path=None):
         exclude=None,
         MIDSin=MID_pain_only)
 
-
     folders = [BASEDIR+'data/data_raw_exp1/']
     out_rew_has_both = load_dataset('rew',
         folders,
@@ -320,7 +310,6 @@ def get_data(dftmp,gen_data_path=None):
         how_many='all',
         exclude=None,
         MIDSin=MID_has_both)
-
 
     folders = [BASEDIR+'data/data_raw_exp1/']
     out_rew_rew_only = load_dataset('rew',
@@ -345,7 +334,6 @@ def get_data(dftmp,gen_data_path=None):
     data['Nboth']=Nboth
     data['Nrewonly']=Nrewonly
     data['Npainonly']=Npainonly
-    #import pdb; pdb.set_trace()
 
     # create data matrices
     # trials X (rew_for_people_w_both,pain_for_people_w_both,rew_for_those_w_rew_only,pain_for_those_w_pain_only)
@@ -381,21 +369,10 @@ def get_data(dftmp,gen_data_path=None):
                                     out_rew_rew_only['block'][:,np.argsort(out_rew_rew_only['MIDS'])],
                                     out_pain_pain_only['block'][:,np.argsort(out_pain_pain_only['MIDS'])]))
 
-    # new as of 3/11/18
     good_outcomes_del_bin = np.hstack((out_rew_has_both['outcomes_del'][:,np.argsort(out_rew_has_both['MIDS'])],
                                     1.0-out_pain_has_both['outcomes_del'][:,np.argsort(out_pain_has_both['MIDS'])],
                                     out_rew_rew_only['outcomes_del'][:,np.argsort(out_rew_rew_only['MIDS'])],
                                     1.0-out_pain_pain_only['outcomes_del'][:,np.argsort(out_pain_pain_only['MIDS'])]))
-
-
-    # This won't be the right size for fitting different numbers of subjects
-    # But doesn't matter because I slice later anyway
-    vols = np.empty((180,157))
-    for i in range(157):
-        vols[:,i] = np.nan # np.loadtxt(BASEDIR+'/model_fitting_analyses_spring19/hbayes/'+str(i)+'/Ivol.txt')
-    data['vols']=1/vols
-    data['vols_demeaned']=data['vols']-np.mean(data['vols'])
-
 
     good_outcomes_del_chi = good_outcomes_del_bin.copy()
     good_outcomes_del_chi[good_outcomes_del_chi==0]=-1
@@ -408,7 +385,6 @@ def get_data(dftmp,gen_data_path=None):
     data['participants_choice_missing']=participants_choice_missing
     data['block']=block
 
-
     # indicators for broadcasting (same shape as data )
     irew= np.hstack((np.ones((180,len(MID_has_both))),
                np.zeros((180,len(MID_has_both))),
@@ -420,7 +396,7 @@ def get_data(dftmp,gen_data_path=None):
     istab=block.copy()
     ivol = 1.0-istab
     print(ivol.shape)
-    if gen_data_path is not None:
+    if gen_data_path is not None: # used for parameter recovery analyses
         gen_data = pickle.load( open(gen_data_path, "rb" ) )
 
         data['participants_choice']=gen_data['participants_choice']
@@ -491,17 +467,6 @@ def get_data(dftmp,gen_data_path=None):
     data['istab']=istab
     data['ivol']=ivol
 
-    # start indicator
-    data['start1']=np.zeros_like(good_outcome)
-    data['start2']=np.zeros_like(good_outcome)
-    data['start3']=np.zeros_like(good_outcome)
-    data['start1'][0,:]=1
-    for i,MID in enumerate(MID_combined):
-        if 'cb' in MID:
-            data['start2'][60,i]=1 # the 61st trial
-            data['start3'][120,i]=1 # the 121st trial
-
-
     rewpain = data['irew'].copy()
     rewpain[rewpain==0]=-1
     data['rewpain']=rewpain
@@ -562,12 +527,12 @@ def get_data(dftmp,gen_data_path=None):
         group_diag.append(diag)
     group_diag=np.array(group_diag)
 
-
     try:
         scores_df_bi3_noASI_w_janines = pd.read_csv(BASEDIR+'fitting_bifactor_model/bifactor_exp1_poly_scores_exp1.csv')
 
     except:
         # place holder until factor analysis is run
+        print('Unable to load factor scores, please check whether they are in the right place.')
         scores_df_bi3_noASI_w_janines = pd.DataFrame(data = {'Unnamed: 0':MID_combined,
                                                         'g':np.ones(len(STAI)),
                                                         'F1.':np.ones(len(STAI)),
@@ -892,6 +857,9 @@ def get_data(dftmp,gen_data_path=None):
 ### load experiment 2 dataset ####
 
 def get_data_online(dftmp):
+    ''' This is called directly to load experiment 2 data.
+
+    '''
     data = {}
 
     MID_has_both =list(dftmp.MID)
@@ -913,7 +881,6 @@ def get_data_online(dftmp):
         exclude=None,
         MIDSin=MID_has_both)
 
-    #import pdb; pdb.set_trace()
     folders = [BASEDIR+'data/data_raw_exp2/']
     out_rew_has_both = load_dataset('gain',
         folders,
@@ -923,9 +890,9 @@ def get_data_online(dftmp):
         MIDSin=MID_has_both)
 
     # Number of subjects X tasks that they have
-    NN = len(MID_has_both)*2#+len(MID_rew_only)+len(MID_pain_only)
+    NN = len(MID_has_both)*2
     print('subj X task:'+str(NN))
-    N = len(MID_has_both)#+len(MID_rew_only)+len(MID_pain_only)
+    N = len(MID_has_both)
     print('subjs:'+str(N))
 
     Nboth = len(MID_has_both)
@@ -1034,11 +1001,6 @@ def get_data_online(dftmp):
     data['istab']=istab
     data['ivol']=ivol
 
-    data['start1']=np.zeros_like(good_outcome)
-    data['start2']=np.zeros_like(good_outcome)
-    data['start3']=np.zeros_like(good_outcome)
-    data['start1'][0,:]=1
-
     rewpain = data['irew'].copy()
     rewpain[rewpain==0]=-1
     data['rewpain']=rewpain
@@ -1052,13 +1014,14 @@ def get_data_online(dftmp):
         scores_df_bi3_noASI_w_janines = pd.read_csv(BASEDIR+'fitting_bifactor_model/bifactor_exp1_poly_scores_exp2.csv')
     except:
         # place holder until factor analysis is run
+        print('Unable to load factor scores, please check whether they are in the right place.')
         MID_combined_temp  = ['X'+MID if len(MID)==4 else MID for MID in MID_combined]
         scores_df_bi3_noASI_w_janines = pd.DataFrame(data = {'Unnamed: 0':MID_combined_temp,
                                                         'g':np.ones(len(MID_combined)),
                                                         'F1.':np.ones(len(MID_combined)),
                                                         'F2.':np.ones(len(MID_combined))})
-    scores_df_bi3_noASI_w_janines=scores_df_bi3_noASI_w_janines.rename(columns={'Unnamed: 0':'MID'})
 
+    scores_df_bi3_noASI_w_janines=scores_df_bi3_noASI_w_janines.rename(columns={'Unnamed: 0':'MID'})
 
     # Covariates
     STAI = []
@@ -1126,7 +1089,7 @@ def get_data_online(dftmp):
     STAI_nonscaled = np.array(STAI)
     STAIanx_nonscaled = np.array(STAIanx)
     STAIdep_nonscaled = np.array(STAIdep)
-    MASQAD_nonscaled = np.array(MASQAD)#scale(MASQAD)
+    MASQAD_nonscaled = np.array(MASQAD)
     MASQAA_nonscaled = np.array(MASQAA)
     MASQAS_nonscaled = np.array(MASQAS)
     MASQDS_nonscaled = np.array(MASQDS)

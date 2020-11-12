@@ -15,7 +15,7 @@ import numpy as np
 import pickle
 import pandas as pd
 
-from model_base2 import create_sel
+from model_base import create_sel
 from choice_fun import *
 from update_fun import *
 

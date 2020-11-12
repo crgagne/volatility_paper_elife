@@ -51,25 +51,16 @@ def add_covariate_to_hyper_prior(u_both_total,
 
     ## SINGLE COVARIATE MODELS ##
     stems_single = {"Bi1itemCDM":'Bi1item_w_j_scaled',
-             'PCA_One': 'PCA_1_scaled',
-             'Oblimin_One_1': 'Oblimin2_1_scaled',
-             'Oblimin_One_2': 'Oblimin2_2_scaled',
-             'PSWQresidP': 'PSWQ_scaled_residPC1',
              'PSWQresidG': 'PSWQ_scaled_residG',
              'PSWQ': 'PSWQ_scaled',
-             'MASQADresidP': 'MASQAD_scaled_residPC1',
              'MASQADresidG': 'MASQAD_scaled_residG',
              'MASQAD': 'MASQAD_scaled',
-             'MASQAAresidP': 'MASQAA_scaled_residPC1',
              'MASQAAresidG': 'MASQAA_scaled_residG',
              'MASQAA': 'MASQAA_scaled',
-             'STAIanxresidP': 'STAIanx_scaled_residPC1',
              'STAIanxresidG': 'STAIanx_scaled_residG',
              'STAIanx': 'STAIanx_scaled',
-             'STAIdepresidP': 'STAIdep_scaled_residPC1',
              'STAIdepresidG': 'STAIdep_scaled_residG',
              'STAIdep': 'STAIdep_scaled',
-             'STAIresidP': 'STAI_scaled_residPC1',
              'STAIresidG': 'STAI_scaled_residG',
              'STAI': 'STAI_scaled',
              }
@@ -94,10 +85,8 @@ def add_covariate_to_hyper_prior(u_both_total,
 
     ## DOUBLE COVARIATE MODELS ##
     stems_double = {"Bi2itemCDM": ['Bi1item_w_j_scaled','Bi2item_w_j_scaled'],
-             'PCA_Two': ['PCA_1_scaled','PCA_2_scaled'],
-             'PCA_Two13': ['PCA_1_scaled','PCA_3_scaled'],
-             'Oblimin_Two': ['Oblimin2_1_scaled','Oblimin2_2_scaled']
              }
+
     if covariate in stems_double.keys():
         stem1 = stems_double[covariate][0]
         stem2 = stems_double[covariate][1]
@@ -133,11 +122,6 @@ def add_covariate_to_hyper_prior(u_both_total,
     ## TRIPlE COVARIATE MODELS ##
     stems_triple = {"Bi3itemCDM": ['Bi1item_w_j_scaled','Bi2item_w_j_scaled','Bi3item_w_j_scaled'],
                     "Bi3itemCDMsubset": ['Bi1item_subset_scaled','Bi2item_subset_scaled','Bi3item_subset_scaled'],
-                    "PCA_Three": ['PCA_1_scaled','PCA_2_scaled','PCA_3_scaled'],
-                    "PC1_ADrP_PSWQrP": ['PCA_1_scaled','MASQAD_scaled_residPC1','PSWQ_scaled_residPC1'],
-                    "PC1_ADrP_AArP": ['PCA_1_scaled','MASQAD_scaled_residPC1','MASQAA_scaled_residPC1'],
-                    "PC1_ADrG_PSWQrG": ['PCA_1_scaled','MASQAD_scaled_residG','PSWQ_scaled_residG'],
-                    "PC1_ADrG_AArG": ['PCA_1_scaled','MASQAD_scaled_residG','MASQAA_scaled_residG'],
                     "G_ADrG_PSWQrG": ['Bi1item_w_j_scaled','MASQAD_scaled_residG','PSWQ_scaled_residG'],
                     "G_ADrG_AArG": ['Bi1item_w_j_scaled','MASQAD_scaled_residG','MASQAA_scaled_residG'],
              }

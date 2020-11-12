@@ -4,36 +4,6 @@ import seaborn as sns
 from convert_params import *
 
 
-name_replace = {
- 'lr_baseline':r'$\alpha_{baseline}$',
- 'lr_goodbad':r'$\alpha_{good-bad}$',
- 'lr_stabvol':r'$\alpha_{volatile-stable}$',
- 'lr_goodbad_stabvol':r'$\alpha_{(good-bad)x(volatile-stable)}$',
- 'lr_c_baseline':r'$\eta_{baseline}$',
- 'Amix_baseline':r'$\lambda_{baseline}$',
- 'Amix_goodbad':r'$\lambda_{good-bad}$',
- 'Amix_stabvol':r'$\lambda_{volatile-stable}$',
- 'Amix_goodbad_stabvol':r'$\lambda_{(good-bad)x(volatile-stable)}$',
- 'Binv_baseline':r'$\omega_{baseline}$',
- 'Binv_goodbad':r'$\omega_{good-bad}$',
- 'Binv_stabvol':r'$\omega_{volatile-stable}$',
- 'Binv_goodbad_stabvol':r'$\omega_{(good-bad)x(volatile-stable)}$',
- 'Bc_baseline':r'$\omega_{(k)baseline}$',
- 'mag_baseline':r'$r_{baseline}$',
- 'lr_rewpain':r'$\alpha_{reward-aversive}$',
- 'lr_rewpain_goodbad':r'$\alpha_{(reward-aversive)x(good-bad)}$',
- 'lr_rewpain_stabvol':r'$\alpha_{(reward-aversive)x(volatile-stable)}$',
- 'lr_rewpain_goodbad_stabvol':r'$\alpha_{(reward-aversive)x(good-bad)x(volatile-stable)}$',
- 'Amix_rewpain':r'$\lambda_{reward-aversive}$',
- 'Amix_rewpain_goodbad':r'$\lambda_{(reward-aversive)x(good-bad)}$',
- 'Amix_rewpain_stabvol':r'$\lambda_{(reward-aversive)x(volatile-stable)}$',
- 'Binv_rewpain':r'$\omega_{reward-aversive}$',
- 'Binv_rewpain_goodbad':r'$\omega_{(reward-aversive)x(good-bad)}$',
- 'Binv_rewpain_stabvol':r'$\omega_{(reward-aversive)x(volatile-stable)}$',
- 'Bc_rewpain':r'$\omega_{(k) reward-aversive}$',
- 'mag_rewpain':r'$r_{reward-aversive}$',
-}
-
 name_replace_nounderscores = {
  'lr_baseline':r'baseline',
  'lr_goodbad':r'(good-bad)',
@@ -76,34 +46,6 @@ name_replace_online_nounderscores = {
 
 }
 
-name_replace_online = {
- 'lr_baseline':r'$\alpha_{baseline}$',
- 'lr_goodbad':r'$\alpha_{good-bad}$',
- 'lr_stabvol':r'$\alpha_{volatile-stable}$',
- 'lr_goodbad_stabvol':r'$\alpha_{(good-bad)x(volatile-stable)}$',
-#  'lr_c_baseline',
-#  'Amix_baseline',
-#  'Amix_goodbad',
-#  'Amix_stabvol',
-#  'Amix_goodbad_stabvol',
-#  'Binv_baseline',
-#  'Binv_goodbad',
-#  'Binv_stabvol',
-#  'Binv_goodbad_stabvol',
-#  'Bc_baseline',
-#  'mag_baseline',
- 'lr_rewpain':r'$\alpha_{gain-loss}$',
- 'lr_rewpain_goodbad':r'$\alpha_{(gain-loss)x(good-bad)}$',
- 'lr_rewpain_stabvol':r'$\alpha_{(gain-loss)x(volatile-stable)}$',
-#  'Amix_rewpain',
-#  'Amix_rewpain_goodbad',
-#  'Amix_rewpain_stabvol',
-#  'Binv_rewpain',
-#  'Binv_rewpain_goodbad',
-#  'Binv_rewpain_stabvol',
-#  'Bc_rewpain',
-#  'mag_rewpain'
-}
 
 def convert_diagnosis_to_color(diag):
     color=[]
@@ -151,7 +93,7 @@ def plot_param_posterior_errorbars_onesubplot(
                 s_bar=5,
                 elinewidth=1,
                 legend_anchor=[0.45,-0.9],
-                name_replace=name_replace):
+                name_replace=name_replace_nounderscores):
 
     '''Error bar plot for parameter components for one parameter type (i.e learning rate)
 
@@ -233,7 +175,6 @@ def plot_param_posterior_errorbars_onesubplot(
         plt.legend(loc='lower center',ncol=1,bbox_to_anchor=legend_anchor,fontsize=legendsize)
 
     sns.despine()
-
 
 def plot_param_by_cond_sep_axes_for_task(trace,
                                 data,
@@ -327,7 +268,6 @@ def plot_param_by_cond_sep_axes_for_task(trace,
                        stdab=1,
                        transform=transform,
                        include_triple=include_triple)
-    #import pdb; pdb.set_trace()
 
     # do a split by factor
     if median==True:
@@ -428,16 +368,6 @@ def plot_param_by_cond_sep_axes_for_task(trace,
                      label='posterior mean (w/ std)'+extra_legend,
                      linestyle='None',marker='o',markersize=s_bar)
 
-    # else:
-    #     plt.errorbar(np.arange(len(pos))-0.1+ebar_offset,
-    #                  y=out[split+'_conds'][slicee],
-    #                  yerr=0,
-    #                  color=color,
-    #                  label='posterior mean (w/ std)'+extra_legend,
-    #                  linestyle='None',marker='o',markersize=s_bar)
-
-
-
     # X ticks
     xticks = out['conds']
     xticks =[p.replace('good','good outcome').replace('stab','stable').replace('rew','') for p in xticks]
@@ -457,163 +387,6 @@ def plot_param_by_cond_sep_axes_for_task(trace,
         plt.legend(loc='lower center',ncol=1,bbox_to_anchor=legend_anchor,fontsize=legendsize)
 
     sns.despine()
-
-
-def plot_param_by_cond_same_axes_for_task(trace1,
-                             data1,
-                             model,
-                             dataset1='clinical',
-                             param = 'lr',
-                             transform = 'logit',
-                             pc ='u_PC1',
-                             generate_codes=generate_codes_7,
-                             median=False,
-                            legend=True,
-                            fig=None,
-                                s_bar=5,
-                            labelsize =10,
-                            ticklabelsize=8,
-                            legendsize=8,):
-
-    # plot features
-    if fig==None:
-        plt.figure(figsize=(6.5,3.5),dpi=300)
-    s =1 # dot size
-    alpha_dist = 0.04
-    alpha_line = 0.
-
-
-    if param=='lr':
-        paramname = r'$\alpha$'
-    elif param=='Amix':
-        paramname = r'$\lambda$'
-    elif param=='Binv':
-        paramname = r'$\omega$'
-    elif param=='B_c':
-        paramname = r'$\omega_k$'
-
-
-    if pc=='u_PC1':
-        factor = 'general'
-        factor_in_data = 'Bi1item_w_j_scaled_all_unique'
-    if pc=='u_PC2':
-        factor = 'depression'
-        factor_in_data = 'Bi2item_w_j_scaled_all_unique'
-    if pc=='u_PC3':
-        factor = 'anxiety'
-        factor_in_data = 'Bi3item_w_j_scaled_all_unique'
-
-    Theta1 = trace1['Theta'].mean(axis=0)
-
-    effects =['baseline','goodbad','stabvol','goodbad_stabvol','rewpain','rewpain_goodbad','rewpain_stabvol']
-    pis = [i for i,p in enumerate(model.params) if (param in p) and (param+'_c' not in p)]
-    piis =np.arange(len(pis))
-    params_tmp =[model.params[pi] for pi in pis]
-
-    # individual subject parameters
-    lrs1,conds1 = get_param_by_subj_by_cond_gbfirst(Theta1,
-                                                  index=pis,
-                                                  effects=effects,
-                                                  dataset=dataset1,
-                                                 transform=transform)
-
-    # get posterior mean for +-1
-    out1 = generate_codes(trace1,
-                         parammixture=False,
-                         pis=pis,
-                       param_trait=pc,
-                       stdab=1,
-                       transform=transform)
-
-    # do a split
-    if median==True:
-        thresh1 = np.median(data1[factor_in_data])
-    else:
-        thresh1 = 0
-    high_idx1 = data1[factor_in_data]>=thresh1
-    low_idx1 = data1[factor_in_data]<thresh1
-
-
-    # reward
-    pos1 = np.array([0,1,2,3])
-    slicee1 = slice(0,4)
-
-    # aversive
-    pos2 = np.array([4,5,6,7])
-    slicee2 = slice(4,8)
-
-
-    for i,split in enumerate(['low','high']):
-
-        plt.subplot(1,2,i+1)
-        if param=='lr':
-            plt.ylim([-0.1,1.1])
-
-        elif param=='Amix':
-            plt.ylim([0,1.])
-        elif param=='Binv':
-            #pass
-            if dataset1=='clinical':
-
-                plt.ylim([0,20])
-            else:
-                #pass
-                plt.ylim([0,5])
-            #pass
-
-        if split=='high':
-            idx=high_idx1
-            color = sns.color_palette()[3]
-            plusminus = '+'
-            eq='>'
-        else:
-            idx=low_idx1
-            color = sns.color_palette()[0]
-            plusminus = '-'
-            eq='<'
-
-        if dataset1=='clinical':
-            taskname1='(reward)'
-            taskname2='(aversive)'
-            title='experiment 1 (in-lab participants)'
-        else:
-            taskname1='(gain)'
-            taskname2='(loss)'
-            title='experiment 2 (online participants)'
-
-
-        # posterior mean estimates
-        plt.errorbar(np.arange(len(pos1))-0.1,
-                     y=out1[split+'_conds'][slicee1],
-                     yerr=np.array(out1[split+'_conds_se'][slicee1]),
-                     c=color,
-                     label=''+plusminus+'1 sd '+factor+' factor '+taskname1,
-                     linestyle='None',marker='o',markersize=s_bar)
-
-        # posterior mean estimates
-        plt.errorbar(np.arange(len(pos2))+0.1,
-                     y=out1[split+'_conds'][slicee2],
-                     yerr=np.array(out1[split+'_conds_se'][slicee2]),
-                     c=color,
-                     label=''+plusminus+'1 sd '+factor+' factor'+taskname2,
-                     linestyle='None',marker='s',markersize=s_bar,markerfacecolor="None")
-
-        # X ticks
-        xticks = out1['conds']
-        xticks =[p.replace('good','good outcome').replace('stab','stable').replace('rew','') for p in xticks]
-        xticks =[p.replace('bad','bad outcome').replace('vol','volatile').replace('pain','') for p in xticks]
-        xticks =[p.replace('_','\n') for p in xticks]
-        plt.xticks(np.arange(len(pos1)),xticks[slicee1],rotation=90,fontsize=ticklabelsize)
-        sns.despine()
-        plt.title(split+' '+factor+' factor scores',fontsize=labelsize)
-        plt.ylabel(paramname,fontsize=labelsize)
-        plt.yticks(fontsize=ticklabelsize)
-        if legend:
-            plt.legend(loc='lower center',ncol=1,bbox_to_anchor=[0.45,-0.72],fontsize=legendsize)
-
-    plt.suptitle(title,fontsize=labelsize)
-    plt.tight_layout()
-
 
 def print_posteriors(params=None,
                      trace_dev=None,
