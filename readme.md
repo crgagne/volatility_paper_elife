@@ -3,7 +3,7 @@
 
 Welcome! This repository contains the data and code needed to reproduce the main figures from our recently submitted paper to Elife. The paper is titled "Impaired adaptation of learning to contingency volatility in internalizing psychopathology" and is authored by Christopher Gagne, Ondrej Zika, Peter Dayan & Sonia J. Bishop.
 
-This Github repository will also be stored within an Open Science Framework (OSF) repository, where it will be hosted permanently: LINK TO BE ADDED WHEN MADE PUBLIC
+This Github repository will also be stored within an Open Science Framework (OSF) repository, where it will be hosted permanently: https://osf.io/8mzuj/
 
 ## Steps for Reproducing the Main Analyses
 
@@ -51,7 +51,7 @@ conda install statsmodels
 
 Note that most Jupyter notebooks should be run using this Python environment. The only exception is the Bifactor modeling notebook.
 
-To activate the environments use `conda activate pymc3_3.6` or `conda activate env_r`. To switch between environments, use `conda deactivate`. 
+To activate the environments use `conda activate pymc3_3.6` or `conda activate env_r`. To switch between environments, use `conda deactivate`.
 
 ## (4) Fitting the Bifactor to Internalizing Questionnaire Data (Optional)
 
