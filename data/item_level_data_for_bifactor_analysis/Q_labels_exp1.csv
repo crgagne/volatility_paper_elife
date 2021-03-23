@@ -1,0 +1,129 @@
+Question,Questionnaire,Subscale,Min,Max,Rev
+I feel pleasant,STAI,anxiety,2.0,4.0,1.0
+I feel nervous and restless,STAI,anxiety,1.0,4.0,
+I feel satisfied with myself,STAI,depression,1.0,4.0,1.0
+I wish I could be as happy as others seem to be,STAI,depression,1.0,4.0,
+I feel like a failure,STAI,depression,1.0,3.0,
+I feel rested,STAI,depression,1.0,4.0,1.0
+"I am 'calm, cool, and collected'",STAI,depression,1.0,4.0,1.0
+I feel that difficulties are piling up so that I can't overcome them,STAI,anxiety,1.0,3.0,
+I worry too much over something that really doesn't matter,STAI,anxiety,1.0,4.0,
+I am happy,STAI,depression,1.0,4.0,1.0
+I have disturbing thoughts,STAI,anxiety,1.0,3.0,
+I lack self-confidence,STAI,depression,1.0,4.0,
+I feel secure,STAI,depression,1.0,4.0,1.0
+I make decisions easily,STAI,depression,1.0,4.0,1.0
+I feel inadequate,STAI,depression,1.0,4.0,
+I am content,STAI,depression,1.0,4.0,1.0
+Some unimportant thought runs through my mind and bothers me,STAI,anxiety,1.0,4.0,
+I take disappointments so keenly that I can't put them out of my mind,STAI,anxiety,1.0,4.0,
+I am a steady person,STAI,depression,2.0,4.0,1.0
+I get in a state of tension or turmoil as I think over my recent concerns and interests,STAI,anxiety,1.0,4.0,
+Does your mood often go up and down? ,EPQ,epq,0.0,1.0,
+Do you ever feel ‘just miserable’ for no reason? ,EPQ,epq,0.0,1.0,
+Are you an irritable person? ,EPQ,epq,0.0,1.0,
+Are your feelings easily hurt? ,EPQ,epq,0.0,1.0,
+Do you often feel 'fed-up'? ,EPQ,epq,0.0,1.0,
+Would you call yourself a nervous person? ,EPQ,epq,0.0,1.0,
+Are you a worrier? ,EPQ,epq,0.0,1.0,
+Would you call yourself tense or ‘highly-strung’? ,EPQ,epq,0.0,1.0,
+Do you worry too long after an embarrassing experience? ,EPQ,epq,0.0,1.0,
+Do you suffer from ‘nerves’? ,EPQ,epq,0.0,1.0,
+Do you often feel lonely? ,EPQ,epq,0.0,1.0,
+Are you often troubled about feelings of guilt? ,EPQ,epq,0.0,1.0,
+"If I don’t have enough time to do everything, I don’t worry about it.",PSWQ,pswq,1.0,5.0,1.0
+My worries overwhelm me.,PSWQ,pswq,1.0,5.0,
+I don’t tend to worry about things. ,PSWQ,pswq,1.0,5.0,1.0
+Many situations make me worry.,PSWQ,pswq,1.0,5.0,
+"I know I shouldn’t worry about things, but I just can’t help it.",PSWQ,pswq,1.0,5.0,
+"When I am under pressure, I worry a lot.",PSWQ,pswq,1.0,5.0,
+I am always worrying about something.,PSWQ,pswq,1.0,5.0,
+I find it easy to dismiss worrisome thoughts.,PSWQ,pswq,1.0,5.0,1.0
+"As soon as I finish one task, I start to worry about everything else I have to do.",PSWQ,pswq,1.0,5.0,
+I never worry about anything.,PSWQ,pswq,1.0,4.0,1.0
+"When there is nothing more I can do about a concern, I don’t worry about it anymore. ",PSWQ,pswq,1.0,5.0,1.0
+I’ve been a worrier all my life.,PSWQ,pswq,1.0,5.0,
+I notice that I have been worrying about things.,PSWQ,pswq,1.0,5.0,
+"Once I start worrying, I can’t stop.",PSWQ,pswq,1.0,5.0,
+I worry all the time.,PSWQ,pswq,1.0,5.0,
+I worry about projects until they are done.,PSWQ,pswq,1.0,5.0,
+Startled easily,MASQ,anxious arousal,1.0,4.0,
+Felt cheerful,MASQ,anhedonic,1.0,5.0,1.0
+Hands were shaky,MASQ,anxious arousal,1.0,3.0,
+Felt optimistic,MASQ,anhedonic,1.0,5.0,1.0
+Felt really happy,MASQ,anhedonic,1.0,5.0,1.0
+Was short of breath,MASQ,anxious arousal,1.0,3.0,
+Was proud of myself,MASQ,anhedonic,1.0,5.0,1.0
+Felt faint,MASQ,anxious arousal,1.0,3.0,
+Felt unattractive,MASQ,anhedonic,1.0,5.0,
+Had hot or cold spells,MASQ,anxious arousal,1.0,4.0,
+Felt like I was having a lot of fun,MASQ,anhedonic,1.0,5.0,1.0
+Hands were cold or sweaty,MASQ,anxious arousal,1.0,3.0,
+Felt withdrawn from other people,MASQ,anhedonic,1.0,5.0,
+Felt like I had a lot of energy,MASQ,anhedonic,1.0,5.0,1.0
+Was trembling or shaking,MASQ,anxious arousal,1.0,3.0,
+Had trouble swallowing,MASQ,anxious arousal,1.0,2.0,
+Felt really slowed down,MASQ,anhedonic,1.0,4.0,
+Felt dizzy or lightheaded,MASQ,anxious arousal,1.0,3.0,
+"Felt really ""up"" or lively",MASQ,anhedonic,1.0,5.0,1.0
+Had pain in my chest,MASQ,anxious arousal,1.0,3.0,
+Felt really bored,MASQ,anhedonic,1.0,4.0,
+Felt like I was choking,MASQ,anxious arousal,1.0,3.0,
+Looked forward to things with enjoyment,MASQ,anhedonic,1.0,5.0,1.0
+Muscles twitched or trembled,MASQ,anxious arousal,1.0,3.0,
+Had a very dry mouth,MASQ,anxious arousal,1.0,4.0,
+Felt like I had a lot of interesting things to do,MASQ,anhedonic,1.0,5.0,1.0
+Was afraid I was going to die,MASQ,anxious arousal,1.0,3.0,
+Felt like I had accomplished a lot,MASQ,anhedonic,1.0,5.0,1.0
+Felt like it took extra effort to get started,MASQ,anhedonic,1.0,5.0,
+Felt like nothing was very enjoyable,MASQ,,1.0,4.0,
+Heart was racing or pounding,MASQ,anxious arousal,1.0,4.0,
+Felt like I had a lot to look forward to,MASQ,anhedonic,1.0,5.0,1.0
+Felt numbness or tingling in my body,MASQ,anxious arousal,1.0,3.0,
+Felt hopeful about the future,MASQ,anhedonic,1.0,5.0,1.0
+Felt like there wasn't anything interesting or fun to do,MASQ,anhedonic,1.0,4.0,
+Seemed to move quickly and easily,MASQ,anhedonic,1.0,5.0,1.0
+Felt really good about myself,MASQ,anhedonic,1.0,5.0,1.0
+Thought about death or suicide,MASQ,anhedonic,1.0,4.0,
+Had to urinate frequently,MASQ,anxious arousal,1.0,4.0,
+I am so sad or unhappy that I can't stand it,BDI,bdi,0.0,2.0,
+I feel that the future is hopeless and that things cannot improve,BDI,bdi,0.0,2.0,
+I feel I am a complete failure as a person,BDI,bdi,0.0,2.0,
+I am dissatisfied or bored with everything,BDI,bdi,0.0,1.0,
+I feel guilty all of the time,BDI,bdi,0.0,1.0,
+I feel I am being punished,BDI,bdi,0.0,2.0,
+I hate myself,BDI,bdi,0.0,2.0,
+I blame myself for everything bad that happens,BDI,bdi,0.0,2.0,
+I would kill myself if I had the chance,BDI,bdi,0.0,1.0,
+"I used to be able to cry, but now I can't cry even though I want to",BDI,bdi,0.0,1.0,
+I feel irritated all the time now,BDI,bdi,0.0,2.0,
+I have lost all of my interest in other people,BDI,bdi,0.0,2.0,
+I can't make decisions at all anymore,BDI,bdi,0.0,2.0,
+I believe that I look ugly,BDI,bdi,0.0,2.0,
+I can't do any work at all,BDI,bdi,0.0,2.0,
+I wake up several hours earlier than I used to and cannot get back to sleep,BDI,bdi,0.0,2.0,
+I am too tired to do anything,BDI,bdi,0.0,2.0,
+I have no appetite at all anymore,BDI,bdi,0.0,1.0,
+I have lost more than fifteen pounds,BDI,bdi,0.0,1.0,
+I am so worried about my physical problems that I cannot think about anything else,BDI,bdi,0.0,1.0,
+I have lost interested in sex completely,BDI,bdi,0.0,1.0,
+I was bothered by things that usually don’t bother me.,CESD,cesd,0.0,2.0,
+I did not feel like eating; my appetite was poor,CESD,cesd,0.0,2.0,
+I felt that I could not shake off the blues even with help from my family or friends.,CESD,cesd,0.0,2.0,
+I felt I was just as good as other people,CESD,cesd,0.0,3.0,1.0
+I had trouble keeping my mind on what I was doing.,CESD,cesd,0.0,3.0,
+I felt depressed.,CESD,cesd,0.0,3.0,
+I felt that everything I did was an effort.,CESD,cesd,0.0,3.0,
+I felt hopeful about the future.,CESD,cesd,0.0,3.0,1.0
+I thought my life had been a failure.,CESD,cesd,0.0,3.0,
+I felt fearful.,CESD,cesd,0.0,2.0,
+My sleep was restless.,CESD,cesd,0.0,3.0,
+I was happy.,CESD,cesd,0.0,3.0,1.0
+I talked less than usual.,CESD,cesd,0.0,2.0,
+I felt lonely.,CESD,cesd,0.0,3.0,
+People were unfriendly.,CESD,cesd,0.0,2.0,
+I enjoyed life.,CESD,cesd,0.0,3.0,1.0
+I had crying spells.,CESD,cesd,0.0,2.0,
+I felt sad.,CESD,cesd,0.0,3.0,
+I felt that people dislike me.,CESD,cesd,0.0,3.0,
+I could not get “going.”,CESD,cesd,0.0,2.0,
