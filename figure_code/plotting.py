@@ -212,7 +212,8 @@ def plot_param_by_cond_sep_axes_for_task(trace,
                                 include_triple=False,
                                 include_errorbar=True,
                                 participant_sel=None,
-                                errorbar_as_simple_mean=False):
+                                errorbar_as_simple_mean=False,
+                                save_data=False):
 
 
     plt.sca(ax)
@@ -387,6 +388,10 @@ def plot_param_by_cond_sep_axes_for_task(trace,
         plt.legend(loc='lower center',ncol=1,bbox_to_anchor=legend_anchor,fontsize=legendsize)
 
     sns.despine()
+
+    if save_data:
+        np.savez('lrs.npz',lrs,conds,high_idx)
+
 
 def print_posteriors(params=None,
                      trace_dev=None,
