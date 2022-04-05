@@ -346,7 +346,7 @@ def main():
                         C[stem+'_'+tail]=data[stem+'_'+tail]
             elif args.exp==2:
                 includes_subjs_with_one_task = False
-                
+
                 # prepare for model code
                 subj_indices = slice(0,data['participants_choice'].shape[1]) #list(np.where(np.array(data['MID_combined'])=='cb100')[0])
                 Nboth = data['Nboth']
@@ -411,7 +411,8 @@ def main():
 
         MAP = {}
 
-        step=pm.HamiltonianMC(target_accept=.95)
+        #step=pm.HamiltonianMC(target_accept=.95)
+        step=pm.HamiltonianMC(target_accept=.90)
 
         print('sampling ...')
         trace = pm.sample(args.steps,step=step,chains=4,tune=args.steps_tune,random_seed=args.seed) # cores = 4

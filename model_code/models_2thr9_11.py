@@ -1,10 +1,6 @@
 import sys
-#sys.path.append('/Users/chris/anaconda/envs/env_pymc3/lib/python3.6/')
-#sys.path.append('/Users/chris/anaconda/envs/env_pymc3/lib/python3.6/site-packages/')
 import imp
-
 import os
-#os.environ["THEANO_FLAGS"] = "exception_verbosity=high,optimizer=None"#"mode=FAST_RUN,device=gpu,floatX=float32"
 
 import pymc3 as pm
 imp.reload(pm)
@@ -12,11 +8,8 @@ import theano
 import theano.tensor as T
 from theano.tensor.shared_randomstreams import RandomStreams
 from theano.ifelse import ifelse
-#from theano.tensor.raw_random import binomial
-#srng = RandomStreams(seed=234)
 
 trng = T.shared_randomstreams.RandomStreams(1234)
-
 
 import numpy as np
 import pickle
@@ -26,9 +19,6 @@ from model_base import create_sel
 from choice_fun import *
 from update_fun import *
 
-
-#choice,outcome_valence,prob_choice,choice_val,estimate_r,
-#lr,Gamma,Binv
 
 def trial_step(info_A_tm1,info_A_t, # externally provided to function on each trial
             obs_choice_tm1,obs_choice_t,
@@ -41,16 +31,16 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
             choice_val_tm1,
             estimate_tm1,
             choice_kernel_tm1,
-            lr_tm1,lr_c_tm1,Gamma_tm1,Binv_tm1,Bc_tm1,mdiff_tm1,eps_tm1,
+            lr_tm1,lr_c_tm1,Amix_tm1,Binv_tm1,Bc_tm1,mdiff_tm1,eps_tm1,
             lr_baseline,lr_goodbad,lr_stabvol,lr_rewpain, # variables accessible on all trials
             lr_goodbad_stabvol,lr_rewpain_goodbad,lr_rewpain_stabvol,
             lr_rewpain_goodbad_stabvol,
             lr_c_baseline,lr_c_goodbad,lr_c_stabvol,lr_c_rewpain, # variables accessible on all trials
             lr_c_goodbad_stabvol,lr_c_rewpain_goodbad,lr_c_rewpain_stabvol,
             lr_c_rewpain_goodbad_stabvol,
-            Gamma_baseline,Gamma_goodbad,Gamma_stabvol,Gamma_rewpain,
-            Gamma_goodbad_stabvol,Gamma_rewpain_goodbad,Gamma_rewpain_stabvol,
-            Gamma_rewpain_goodbad_stabvol,
+            Amix_baseline,Amix_goodbad,Amix_stabvol,Amix_rewpain,
+            Amix_goodbad_stabvol,Amix_rewpain_goodbad,Amix_rewpain_stabvol,
+            Amix_rewpain_goodbad_stabvol,
             Binv_baseline,Binv_goodbad,Binv_stabvol,Binv_rewpain,
             Binv_goodbad_stabvol,Binv_rewpain_goodbad,Binv_rewpain_stabvol,
             Binv_rewpain_goodbad_stabvol,
@@ -59,7 +49,7 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
             Bc_rewpain_goodbad_stabvol,
             mag_baseline,mag_rewpain,
             eps_baseline,eps_stabvol,eps_rewpain,eps_rewpain_stabvol,
-            gen_indicator,B_max):
+            gen_indicator,B_max,nonlinear_indicator):
     '''
     Trial by Trial updates for the model
 
@@ -71,18 +61,17 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
                  (1.0-choice_tm1)*info_A_tm1*(-1.0) + \
                  (choice_tm1)*(1.0-info_A_tm1)*(-1.0)
 
-    # determine Gamma for this trial using last good outcome
-    Gamma_t = Gamma_baseline + \
-        outcome_valence_tm1*Gamma_goodbad + \
-        stabvol_t*Gamma_stabvol + \
-        rewpain_t*Gamma_rewpain + \
-        outcome_valence_tm1*stabvol_t*Gamma_goodbad_stabvol + \
-        outcome_valence_tm1*rewpain_t*Gamma_rewpain_goodbad + \
-        stabvol_t*rewpain_t*Gamma_rewpain_stabvol + \
-        outcome_valence_tm1*stabvol_t*rewpain_t*Gamma_rewpain_goodbad_stabvol
+    # determine Amix for this trial using last good outcome
+    Amix_t = Amix_baseline + \
+        outcome_valence_tm1*Amix_goodbad + \
+        stabvol_t*Amix_stabvol + \
+        rewpain_t*Amix_rewpain + \
+        outcome_valence_tm1*stabvol_t*Amix_goodbad_stabvol + \
+        outcome_valence_tm1*rewpain_t*Amix_rewpain_goodbad + \
+        stabvol_t*rewpain_t*Amix_rewpain_stabvol + \
+        outcome_valence_tm1*stabvol_t*rewpain_t*Amix_rewpain_goodbad_stabvol
 
-    Gamma_t =pm.invlogit(Gamma_t)*5 # [0,5]
-
+    Amix_t =pm.invlogit(Amix_t)
 
     # Determine Binv for this trial using last good outcome
     Binv_t = Binv_baseline + \
@@ -108,25 +97,42 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
         stabvol_t*rewpain_t*Bc_rewpain_stabvol + \
         outcome_valence_tm1*stabvol_t*rewpain_t*Bc_rewpain_goodbad_stabvol
 
-    #Bc_t = T.exp(Bc_t)
-    #Bc_t = T.switch(Bc_t<0.1,0.1,Bc_t )
+    Mag_t = T.exp(mag_baseline+rewpain_t*mag_rewpain)
+    Mag_t= T.switch(Mag_t<0.1,0.1,Mag_t)
+    Mag_t= T.switch(Mag_t>10,10,Mag_t)
+
     Bc_t = T.switch(Bc_t>B_max.value,B_max.value,Bc_t)
     Bc_t = T.switch(Bc_t<-1*B_max.value,-1*B_max.value,Bc_t)
 
-    # Calculate Choice
+    # define the defaults that will be replaced
+    mdiff_t = (mag_1_t-mag_0_t)
+    pdiff_t=(estimate_tm1-(1.0-estimate_tm1)) # compute value from previous probability estimates
 
-    ev_1_t = (T.abs_(mag_1_t)**Gamma_t)*estimate_tm1
-    ev_0_t = (T.abs_(mag_0_t)**Gamma_t)*(1-estimate_tm1)
-    evdiff_t = (ev_1_t - ev_0_t)
+    # Nonlinear magnitude or probability
+    if nonlinear_indicator.value==0:
+        # scale mag diff
+        mdiff_t = T.sgn(mdiff_t)*T.abs_(mdiff_t)**Mag_t
+    elif nonlinear_indicator.value==2:
+        # scale mags separately
+        mdiff_t = (T.sgn(mag_1_t)*T.abs_(mag_1_t)**Mag_t)-(T.sgn(mag_0_t)*T.abs_(mag_0_t)**Mag_t)
+    elif nonlinear_indicator.value==3:
+        # scale prob separately
+        estimate_tm1 = estimate_tm1**Mag_t
+        estimate_tm1 = T.switch(estimate_tm1<0.01,0.01,estimate_tm1)
+        estimate_tm1 = T.switch(estimate_tm1>0.99,0.99,estimate_tm1)
+        pdiff_t=(estimate_tm1-(1.0-estimate_tm1)) # compute value from previous probability estimates
 
-    mdiff_t = (mag_1_t-mag_0_t) # not used but passed on
+    elif nonlinear_indicator.value==1:
+        # scale prob diff
+        pdiff_t = T.sgn(pdiff_t)*T.abs_(pdiff_t)**Mag_t
 
-
+    # choice kernel diff
     cdiff_t=(choice_kernel_tm1-(1.0-choice_kernel_tm1))
 
-    choice_val_t = Binv_t*evdiff_t + Bc_t*cdiff_t
+    # Value
+    choice_val_t = Binv_t*((1-Amix_t)*mdiff_t + (Amix_t)*pdiff_t) + Bc_t*cdiff_t
 
-    # before Gamma, choice value goes between -1 and 1
+    # before Amix, choice value goes between -1 and 1
     prob_choice_t = 1.0/(1.0+T.exp(-1.0*choice_val_t))
 
     # determine eps
@@ -144,14 +150,7 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
     if gen_indicator.value==0:
         choice_t = obs_choice_t
     else:
-        #import pdb; pdb.set_trace()
-        #trng = T.shared_randomstreams.RandomStreams(1234)
         choice_t = trng.binomial(n=1, p=prob_choice_t,dtype='float64')
-        # this works, but I don't want everyone binomial to have the same seed, so I'd want to update by 1
-        #rng_val = choice_t.rng.get_value(borrow=True)   # Get the rng for rv_u
-        #rng_val.seed(seed.value)                         # seeds the generator
-        #choice_t.rng.set_value(rng_val, borrow=True)
-
 
     # determine whether current trial is good or bad
     outcome_valence_t = choice_t*info_A_t +\
@@ -159,7 +158,6 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
                  (1.0-choice_t)*info_A_t*(-1.0) + \
                  (choice_t)*(1.0-info_A_t)*(-1.0)
 
-    #import pdb; pdb.set_trace()
     lr_t = lr_baseline + \
         outcome_valence_t*lr_goodbad + \
         stabvol_t*lr_stabvol + \
@@ -189,7 +187,7 @@ def trial_step(info_A_tm1,info_A_t, # externally provided to function on each tr
 
     choice_kernel_t =  choice_kernel_tm1 + lr_c_t*(choice_t - choice_kernel_tm1)
 
-    return([choice_t,outcome_valence_t,prob_choice_t,choice_val_t,estimate_t,choice_kernel_t,lr_t,lr_c_t,Gamma_t,Binv_t,Bc_t,mdiff_t,eps_t])
+    return([choice_t,outcome_valence_t,prob_choice_t,choice_val_t,estimate_t,choice_kernel_t,lr_t,lr_c_t,Amix_t,Binv_t,Bc_t,mdiff_t,eps_t])
 
 
 
@@ -222,8 +220,8 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
     # Generate specific parameters (verbose.. ugh)
     lr_baseline = 0; lr_goodbad = 0; lr_stabvol = 0; lr_rewpain = 0
     lr_goodbad_stabvol = 0; lr_rewpain_goodbad = 0; lr_rewpain_stabvol = 0; lr_rewpain_goodbad_stabvol = 0
-    Gamma_baseline = 0; Gamma_goodbad = 0; Gamma_stabvol = 0; Gamma_rewpain = 0
-    Gamma_goodbad_stabvol = 0; Gamma_rewpain_goodbad = 0; Gamma_rewpain_stabvol = 0; Gamma_rewpain_goodbad_stabvol = 0
+    Amix_baseline = 0; Amix_goodbad = 0; Amix_stabvol = 0; Amix_rewpain = 0
+    Amix_goodbad_stabvol = 0; Amix_rewpain_goodbad = 0; Amix_rewpain_stabvol = 0; Amix_rewpain_goodbad_stabvol = 0
     Binv_baseline = 0; Binv_goodbad = 0; Binv_stabvol = 0; Binv_rewpain = 0
     Binv_goodbad_stabvol = 0; Binv_rewpain_goodbad = 0; Binv_rewpain_stabvol = 0
     Binv_rewpain_goodbad_stabvol = 0
@@ -269,22 +267,22 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
             lr_c_rewpain_stabvol = Theta[:,pi]
         if param=='lr_c_rewpain_goodbad_stabvol':
             lr_c_rewpain_goodbad_stabvol = Theta[:,pi]
-        if param=='Gamma_baseline':
-            Gamma_baseline = Theta[:,pi]
-        if param=='Gamma_goodbad':
-            Gamma_goodbad = Theta[:,pi]
-        if param=='Gamma_stabvol':
-            Gamma_stabvol = Theta[:,pi]
-        if param=='Gamma_rewpain':
-            Gamma_rewpain = Theta[:,pi]
-        if param=='Gamma_goodbad_stabvol':
-            Gamma_goodbad_stabvol = Theta[:,pi]
-        if param=='Gamma_rewpain_goodbad':
-            Gamma_rewpain_goodbad = Theta[:,pi]
-        if param=='Gamma_rewpain_stabvol':
-            Gamma_rewpain_stabvol = Theta[:,pi]
-        if param=='Gamma_rewpain_goodbad_stabvol':
-            Gamma_rewpain_goodbad_stabvol = Theta[:,pi]
+        if param=='Amix_baseline':
+            Amix_baseline = Theta[:,pi]
+        if param=='Amix_goodbad':
+            Amix_goodbad = Theta[:,pi]
+        if param=='Amix_stabvol':
+            Amix_stabvol = Theta[:,pi]
+        if param=='Amix_rewpain':
+            Amix_rewpain = Theta[:,pi]
+        if param=='Amix_goodbad_stabvol':
+            Amix_goodbad_stabvol = Theta[:,pi]
+        if param=='Amix_rewpain_goodbad':
+            Amix_rewpain_goodbad = Theta[:,pi]
+        if param=='Amix_rewpain_stabvol':
+            Amix_rewpain_stabvol = Theta[:,pi]
+        if param=='Amix_rewpain_goodbad_stabvol':
+            Amix_rewpain_goodbad_stabvol = Theta[:,pi]
         if param=='Binv_baseline':
             Binv_baseline = Theta[:,pi]
         if param=='Binv_goodbad':
@@ -339,19 +337,18 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
     starting_outcome_valence = T.ones(NN)#,dtype='int64')#
     starting_lr = T.ones(NN)*0.5
     starting_lr_c = T.ones(NN)*0.5
-    starting_Gamma = T.ones(NN)*0.5
+    starting_Amix = T.ones(NN)*0.5
     starting_Binv = T.ones(NN)*0.5
     starting_Bc = T.ones(NN)*0.5
     starting_choice_kernel = T.ones(NN)*0.5
     starting_mdiff= T.ones(NN)*0.2
     starting_eps = T.ones(NN)*0.2
-    #import pdb; pdb.set_trace()
 
     (choice,outcome_valence,prob_choice,choice_val,estimate_r,choice_kernel,
-    lr,lr_c,Gamma,Binv,Bc,mdiff,eps), updates = theano.scan(fn=trial_step,
+    lr,lr_c,Amix,Binv,Bc,mdiff,eps), updates = theano.scan(fn=trial_step,
                                             outputs_info=[starting_choice,starting_outcome_valence, # observables
                                                 starting_prob_choice,starting_choice_val,starting_estimate_r,starting_choice_kernel,
-                                                starting_lr,starting_lr_c,starting_Gamma,starting_Binv,starting_Bc,starting_mdiff,starting_eps], # note that outcome c flipped are outcome A is assigned good outcome; should be called info
+                                                starting_lr,starting_lr_c,starting_Amix,starting_Binv,starting_Bc,starting_mdiff,starting_eps], # note that outcome c flipped are outcome A is assigned good outcome; should be called info
                                             sequences=[dict(input=T.as_tensor_variable(np.vstack((np.ones(NN),X['outcomes_c_flipped']))),taps=[-1,0]),
                                                     dict(input=T.as_tensor_variable(np.vstack((np.ones(NN),Y['participants_choice']))),taps=[-1,0]),
                                                     T.as_tensor_variable(X['mag_1_c']),
@@ -364,9 +361,9 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
                                                             lr_c_baseline,lr_c_goodbad,lr_c_stabvol,lr_c_rewpain,
                                                             lr_c_goodbad_stabvol,lr_c_rewpain_goodbad,lr_c_rewpain_stabvol,
                                                             lr_c_rewpain_goodbad_stabvol,
-                                                            Gamma_baseline,Gamma_goodbad,Gamma_stabvol,Gamma_rewpain,
-                                                            Gamma_goodbad_stabvol,Gamma_rewpain_goodbad,Gamma_rewpain_stabvol,
-                                                            Gamma_rewpain_goodbad_stabvol,
+                                                            Amix_baseline,Amix_goodbad,Amix_stabvol,Amix_rewpain,
+                                                            Amix_goodbad_stabvol,Amix_rewpain_goodbad,Amix_rewpain_stabvol,
+                                                            Amix_rewpain_goodbad_stabvol,
                                                             Binv_baseline,Binv_goodbad,Binv_stabvol,Binv_rewpain,
                                                             Binv_goodbad_stabvol,Binv_rewpain_goodbad,Binv_rewpain_stabvol,
                                                             Binv_rewpain_goodbad_stabvol,
@@ -376,11 +373,11 @@ def create_choice_model(X,Y,param_names,Theta,gen_indicator=0,B_max=10.0,nonline
                                                             mag_baseline,mag_rewpain,
                                                             eps_baseline,eps_stabvol,eps_rewpain,
                                                             eps_rewpain_stabvol,
-                                                            gen_indicator,B_max],
+                                                            gen_indicator,B_max,nonlinear_indicator],
                                                       strict=True)
 
 
-    return((choice,outcome_valence,prob_choice,choice_val,estimate_r,choice_kernel,lr,lr_c,Gamma,Binv,Bc,mdiff,eps), updates)
+    return((choice,outcome_valence,prob_choice,choice_val,estimate_r,choice_kernel,lr,lr_c,Amix,Binv,Bc,mdiff,eps), updates)
 
 
 
@@ -408,7 +405,7 @@ def combined_prior_model_to_choice_model(X,Y,param_names,model,
 
         (choice,outcome_valence,
         prob_choice,choice_val,
-        estimate_r,choice_kernel,lr,lr_c,Gamma,Binv,Bc,mdiff,eps), updates = create_choice_model(X,Y,param_names,model.Theta,gen_indicator=0,B_max=B_max)
+        estimate_r,choice_kernel,lr,lr_c,Amix,Binv,Bc,mdiff,eps), updates = create_choice_model(X,Y,param_names,model.Theta,gen_indicator=0,B_max=B_max,nonlinear_indicator=nonlinear_indicator)
 
         if save_state_variables:
             estimate_r = pm.Deterministic('estimate_r',estimate_r)
@@ -419,7 +416,7 @@ def combined_prior_model_to_choice_model(X,Y,param_names,model,
             choice_kernel = pm.Deterministic('choice_kernel',choice_kernel)
             lr = pm.Deterministic('lr',lr)
             lr_c = pm.Deterministic('lr_c',lr_c)
-            Gamma = pm.Deterministic('Gamma',Gamma)
+            Amix = pm.Deterministic('Amix',Amix)
             Binv = pm.Deterministic('Binv',Binv)
             Bc = pm.Deterministic('Bc',Bc)
             mdiff = pm.Deterministic('mdiff',mdiff)
@@ -446,7 +443,7 @@ def create_gen_choice_model(X,Y,param_names,B_max=10.0,seed=1,nonlinear_indicato
 
     (choice,outcome_valence,
     prob_choice,choice_val,
-    estimate_r,choice_kernel,lr,lr_c,Gamma,Binv,Bc,mdiff,eps), updates = create_choice_model(X,Y,param_names,Theta,gen_indicator=1,B_max=B_max)
+    estimate_r,choice_kernel,lr,lr_c,Amix,Binv,Bc,mdiff,eps), updates = create_choice_model(X,Y,param_names,Theta,gen_indicator=1,B_max=B_max,nonlinear_indicator=nonlinear_indicator)
 
     # set random seed when compiling the function
     shared_random_stream = [u for u in updates][0] # don't know how to unpack otherwise; returns a RandomStateSharedVariable which has a random state
@@ -457,6 +454,6 @@ def create_gen_choice_model(X,Y,param_names,B_max=10.0,seed=1,nonlinear_indicato
     f = theano.function([Theta],
     [choice,outcome_valence,
     prob_choice,choice_val,
-    estimate_r,choice_kernel,lr,lr_c,Gamma,Binv,Bc,mdiff,eps],updates=updates)#no_default_updates=True)
+    estimate_r,choice_kernel,lr,lr_c,Amix,Binv,Bc,mdiff,eps],updates=updates)#no_default_updates=True)
 
     return(f)
